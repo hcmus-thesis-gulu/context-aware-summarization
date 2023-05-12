@@ -40,8 +40,14 @@ def extract_features(video_path, output_folder):
                 img = Image.fromarray(frame)
                 img = transform(img).unsqueeze(0)
                 with torch.no_grad():
-                    features = model(img).squeeze().numpy()
-                    frames.append(features)
+                    features = model(img)
+                    
+                    # L2 normalize features
+                    features = features / features.norm(dim=-1, keepdim=True)
+                    # Apply Softmax with Torch
+                    features = torch.nn.functional.softmax(features, dim=-1)
+                    
+                    frames.append(features.squeeze(0).numpy())
 
             # Save feature embeddings to file
             frames = np.array(frames)

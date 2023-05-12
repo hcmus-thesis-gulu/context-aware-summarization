@@ -4,22 +4,31 @@ import torch
 import numpy as np
 from PIL import Image
 from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
-from transformers import DINOHead, DINOBackbone
+from transformers import DinoModel, DinoFeatureExtractor
+
+
+# Load DINO model and feature extractor
+model = DinoModel.from_pretrained('facebook/dino-vits16')
+feature_extractor = DinoFeatureExtractor.from_pretrained('facebook/dino-vits16')
+
+
+def extract_embedding(img):
+    # Extract features
+    with torch.no_grad():
+        features = model(img, features_only=True)
+        embeddings = feature_extractor(features)
+
+    return embeddings
+
 
 def extract_features(video_path, output_folder):
-    # Load DINO model
-    model = DINOBackbone.from_pretrained('facebook/dino-vitb16')
-    head = DINOHead(768, 1024)
-    model = torch.nn.Sequential(model, head)
-
-    # Set up transforms
+    # Define transformations
     transform = Compose([
         Resize((224, 224)),
-        CenterCrop((224, 224)),
-        ToTensor(),
-        Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ToTensor()
     ])
-
+    
     # Extract features for each video file
     for filename in os.listdir(video_path):
         if filename.endswith('.mp4'):
@@ -40,7 +49,7 @@ def extract_features(video_path, output_folder):
                 img = Image.fromarray(frame)
                 img = transform(img).unsqueeze(0)
                 with torch.no_grad():
-                    features = model(img)
+                    features = extract_embedding(img)
                     
                     # L2 normalize features
                     features = features / features.norm(dim=-1, keepdim=True)

@@ -6,6 +6,7 @@ from PIL import Image
 from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from transformers import ViTFeatureExtractor, ViTModel
 import cv2
+from tqdm import tqdm
 
 
 # Load DINO model and feature extractor
@@ -25,11 +26,7 @@ def extract_embedding(img):
 
 def extract_features(video_path, output_folder):
     # Define transformations
-    transform = Compose([
-        Resize((224, 224)),
-        Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ToTensor()
-    ])
+    transform = ToTensor()
     
     # Extract features for each video file
     for filename in os.listdir(video_path):
@@ -41,13 +38,16 @@ def extract_features(video_path, output_folder):
 
             # Extract features for each frame of the video
             cap = cv2.VideoCapture(video_file)
+            total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
             frames = []
+            pbar = tqdm(total=total_frame_count)
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
 
-                # Convert frame to tensor and extract features
+                # Convert frame to PyTorch tensor and extract features
                 img = Image.fromarray(frame)
                 img = transform(img).unsqueeze(0)
                 with torch.no_grad():
@@ -59,6 +59,10 @@ def extract_features(video_path, output_folder):
                     features = torch.nn.functional.softmax(features, dim=-1)
                     
                     frames.append(features.squeeze(0).numpy())
+                    
+                pbar.update(1)
+            
+            pbar.close()
 
             # Save feature embeddings to file
             frames = np.array(frames)

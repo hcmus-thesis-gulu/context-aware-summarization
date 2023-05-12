@@ -3,8 +3,9 @@ import os
 import torch
 import numpy as np
 from PIL import Image
-from torchvision.transforms import Compose, Resize, CenterCrop, ToTensor, Normalize
+from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from transformers import DinoModel, DinoFeatureExtractor
+import cv2
 
 
 # Load DINO model and feature extractor
@@ -61,6 +62,7 @@ def extract_features(video_path, output_folder):
             # Save feature embeddings to file
             frames = np.array(frames)
             np.save(output_file, frames)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract DINO features from videos')

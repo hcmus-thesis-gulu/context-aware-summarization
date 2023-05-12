@@ -4,20 +4,21 @@ import torch
 import numpy as np
 from PIL import Image
 from torchvision.transforms import Compose, Resize, ToTensor, Normalize
-from transformers import DinoModel, DinoFeatureExtractor
+from transformers import ViTFeatureExtractor, ViTModel
 import cv2
 
 
 # Load DINO model and feature extractor
-model = DinoModel.from_pretrained('facebook/dino-vits16')
-feature_extractor = DinoFeatureExtractor.from_pretrained('facebook/dino-vits16')
+feature_extractor = ViTFeatureExtractor.from_pretrained('facebook/dino-vitb16')
+model = ViTModel.from_pretrained('facebook/dino-vitb16')
 
 
 def extract_embedding(img):
     # Extract features
     with torch.no_grad():
-        features = model(img, features_only=True)
-        embeddings = feature_extractor(features)
+        inputs = feature_extractor(images=img, return_tensors="pt")
+        outputs = model(**inputs)
+        embeddings = outputs.last_hidden_state
 
     return embeddings
 

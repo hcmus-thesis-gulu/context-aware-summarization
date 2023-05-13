@@ -7,6 +7,7 @@ from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from transformers import ViTFeatureExtractor, ViTModel
 import cv2
 from tqdm import tqdm
+import random
 
 
 # Load DINO model and feature extractor
@@ -24,7 +25,7 @@ def extract_embedding(img):
     return embeddings
 
 
-def extract_features(video_path, output_folder):
+def extract_features(video_path, output_folder, n_frames_per_second=1):
     # Define transformations
     transform = ToTensor()
     
@@ -39,13 +40,23 @@ def extract_features(video_path, output_folder):
             # Extract features for each frame of the video
             cap = cv2.VideoCapture(video_file)
             total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            # Get the video's frame rate
+            fps = cap.get(cv2.CAP_PROP_FPS)
 
             frames = []
             pbar = tqdm(total=total_frame_count)
+            # Calculate the number of frames to skip between samples
+            skip_frames = int(fps / n_frames_per_second)
+            
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
+                
+                # Randomly decide whether to keep this frame or not
+                if random.random() < 1.0 / skip_frames:
+                    # Do something with the frame here
+                    pass
 
                 # Convert frame to PyTorch tensor and extract features
                 img = Image.fromarray(frame)
@@ -75,6 +86,8 @@ if __name__ == '__main__':
                         help='Path to folder containing videos')
     parser.add_argument('--output-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
+    parser.add_argument('--frame-rate', type=str, required=True,
+                        help='Number of frames per second to sample from videos')
     args = parser.parse_args()
 
-    extract_features(args.video_path, args.output_folder)
+    extract_features(args.video_path, args.output_folder, args.frame_rate)

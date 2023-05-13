@@ -54,9 +54,9 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
                     break
                 
                 # Randomly decide whether to keep this frame or not
-                if random.random() < 1.0 / skip_frames:
-                    # Do something with the frame here
-                    pass
+                if random.random() > 1.0 / skip_frames:
+                    # Skip the frame
+                    continue
 
                 # Convert frame to PyTorch tensor and extract features
                 img = Image.fromarray(frame)
@@ -74,6 +74,8 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
                 pbar.update(1)
             
             pbar.close()
+            
+            cap.release()
 
             # Save feature embeddings to file
             frames = np.array(frames)
@@ -86,7 +88,7 @@ if __name__ == '__main__':
                         help='Path to folder containing videos')
     parser.add_argument('--output-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
-    parser.add_argument('--frame-rate', type=str, required=True,
+    parser.add_argument('--frame-rate', type=int, required=True,
                         help='Number of frames per second to sample from videos')
     args = parser.parse_args()
 

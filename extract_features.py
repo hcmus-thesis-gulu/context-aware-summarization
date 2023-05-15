@@ -35,7 +35,8 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
             print(f'Extracting features for {filename}')
             video_name = os.path.splitext(filename)[0]
             video_file = os.path.join(video_path, filename)
-            output_file = os.path.join(output_folder, f'{video_name}.npy')
+            feature_file = os.path.join(output_folder, f'{video_name}.npy')
+            sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
 
             # Extract features for each frame of the video
             cap = cv2.VideoCapture(video_file)
@@ -44,6 +45,7 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
             fps = cap.get(cv2.CAP_PROP_FPS)
 
             frames = []
+            samples = []
             pbar = tqdm(total=total_frame_count)
             # Calculate the number of frames to skip between samples
             skip_frames = int(fps / n_frames_per_second)
@@ -70,6 +72,7 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
                     features = torch.nn.functional.softmax(features, dim=-1)
                     
                     frames.append(features.squeeze(0).numpy())
+                    samples.append(frame)
                     
                 pbar.update(1)
             
@@ -79,14 +82,16 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
 
             # Save feature embeddings to file
             frames = np.array(frames)
-            np.save(output_file, frames)
+            np.save(feature_file, frames)
+            samples = np.array(samples)
+            np.save(sample_file, samples)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Extract DINO features from videos')
-    parser.add_argument('--video-path', type=str, required=True,
+    parser.add_argument('--video-folder', type=str, required=True,
                         help='Path to folder containing videos')
-    parser.add_argument('--output-folder', type=str, required=True,
+    parser.add_argument('--feature-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
     parser.add_argument('--frame-rate', type=int, required=True,
                         help='Number of frames per second to sample from videos')

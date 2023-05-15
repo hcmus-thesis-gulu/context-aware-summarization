@@ -10,7 +10,7 @@ fi
 mkdir -p $2/features $2/clustering
 
 # Run feature extraction script with arguments
-python extract_features.py --video-path $1 --output-folder $2/features
+python extract_features.py --video-folder $1 --feature-folder $2/features
 
 # Run clustering script with arguments
-python clustering.py $2/features $2/clustering
+python clustering.py --video-folder $1 --feature-folder $2/features --clustering-folder $2/clustering --method kmeans --num-clusters 10

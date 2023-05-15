@@ -97,4 +97,4 @@ if __name__ == '__main__':
                         help='Number of frames per second to sample from videos')
     args = parser.parse_args()
 
-    extract_features(args.video_path, args.output_folder, args.frame_rate)
+    extract_features(args.video_folder, args.feature_folder, args.frame_rate)

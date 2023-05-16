@@ -20,9 +20,12 @@ model.to(device)
 def extract_embedding(img):
     # Extract features
     with torch.no_grad():
+        print('BEFORE INPUTS')
         inputs = feature_extractor(images=img, return_tensors="pt")
+        print('AFTER INPUTS')
         if device == 'cuda':
             inputs.to(device)
+            print('AFTER DEVICE', type(inputs))
         outputs = model(**inputs)
         embeddings = outputs.last_hidden_state
 

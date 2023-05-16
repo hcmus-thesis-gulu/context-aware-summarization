@@ -22,6 +22,7 @@ def extract_embedding(img):
     with torch.no_grad():
         inputs = feature_extractor(images=img, return_tensors="pt")
         if device == 'cuda':
+            print(type(outputs), type(inputs))
             inputs = inputs.cuda()
         outputs = model(**inputs)
         embeddings = outputs.last_hidden_state

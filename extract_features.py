@@ -111,7 +111,6 @@ def extract_features(video_path, output_folder, frame_rate=None, representation=
         with torch.device(device):
             if filename.endswith('.mp4'):
                 extract_embedding_from_video(video_path, filename, output_folder, frame_rate, representation)
-                break
 
 if __name__ == '__main__':
     start_time = time.time()

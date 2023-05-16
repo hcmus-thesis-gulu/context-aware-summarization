@@ -6,6 +6,8 @@ from PIL import Image
 from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from transformers import ViTFeatureExtractor, ViTModel
 import cv2
+from tqdm import tqdm
+import random
 import time
 
 
@@ -43,8 +45,6 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
             sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
             if os.path.exists(feature_file) and os.path.exists(sample_file):
                 continue
-            if video_name != 'Bus_in_Rock_Tunnel':
-                continue
 
             # Extract features for each frame of the video
             cap = cv2.VideoCapture(video_file)
@@ -54,7 +54,7 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
 
             frames = []
             samples = []
-            images = []
+            pbar = tqdm(total=total_frame_count)
             # Calculate the number of frames to skip between samples
             # skip_frames = int(fps / n_frames_per_second)
             if n_frames_per_second:
@@ -76,23 +76,22 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
 
                 # Convert frame to PyTorch tensor and extract features
                 img = Image.fromarray(frame)
-                images.append(img)
-                # img = transform(img).unsqueeze(0)
+                img = transform(img).unsqueeze(0)
                 with torch.no_grad():
-                    # features = extract_embedding(img)
+                    features = extract_embedding(img)
                     
                     # L2 normalize features
-                    # features = features / features.norm(dim=-1, keepdim=True)
+                    features = features / features.norm(dim=-1, keepdim=True)
                     # Apply Softmax with Torch
-                    # features = torch.nn.functional.softmax(features, dim=-1)
+                    features = torch.nn.functional.softmax(features, dim=-1)
                     
-                    # frames.append(features.squeeze(0).numpy())
+                    frames.append(features.squeeze(0).numpy())
                     samples.append(frame)
+                    
+                pbar.update(1)
             
-            # images = np.array(images)
-            frames = extract_embedding(images).numpy()
-            frames = frames / frames.norm(dim=-1, keepdim=True)
-            frames = torch.nn.functional.softmax(frames, dim=-1)
+            pbar.close()
+            
             cap.release()
 
             # Save feature embeddings to file

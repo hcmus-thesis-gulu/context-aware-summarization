@@ -78,8 +78,8 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
         img = Image.fromarray(frame, mode="RGB")
         img = transform(img).unsqueeze(0)
         with torch.no_grad():
-            # features = extract_embedding(img)
-            features = torch.randn(1, 197, 768)
+            features = extract_embedding_from_image(img)
+            # features = torch.randn(1, 197, 768)
             # L2 normalize features
             features = features / features.norm(dim=-1, keepdim=True)
             # Apply Softmax with Torch

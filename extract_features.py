@@ -59,7 +59,7 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     
     # Create holders
     frames = np.zeros((total_samples, vit_dim_x, vit_dim_y))
-    samples = np.zeros((total_samples, height, width, channel))
+    samples = np.zeros((total_samples))
 
     pbar = tqdm(total=total_samples)
     
@@ -88,7 +88,7 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
                 frames[result_index] = features.detach().cpu().squeeze(0).numpy()
             else:
                 frames[result_index] = features.squeeze(0).numpy()
-            samples[result_index] = frame
+            samples[result_index] = frame_index
         
         result_index += 1
         frame_index += 1

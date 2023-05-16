@@ -54,8 +54,5 @@ def main():
     visualize_video(args.feature_folder, args.clustering_folder, 
                     args.demo_folder, args.video_name)
     
-
-    
-
 if __name__ == '__main__':
     main()

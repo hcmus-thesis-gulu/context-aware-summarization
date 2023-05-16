@@ -39,7 +39,7 @@ def main():
                         help='path to output folder for clustering')
   parser.add_argument('--demo-folder', type=str, required=True,
                         help='path to folder saving demo videos')
-  parser.add_argument('--visual-type', type=str, default='cluster', required=True,
+  parser.add_argument('--visual-type', type=str, default='cluster',
                         choices=['cluster', 'video'],
                         help='visual type')
   parser.add_argument('--video-name', type=str,

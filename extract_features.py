@@ -15,7 +15,7 @@ model = ViTModel.from_pretrained('facebook/dino-vitb16')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model.to(device)
 
-vit_dim_x, vit_dim_y = 197, 768
+vit_dim = 768
 
 def extract_embedding_from_image(image):
     # Extract features
@@ -28,7 +28,7 @@ def extract_embedding_from_image(image):
             embeddings = outputs.last_hidden_state
         return embeddings   
 
-def extract_embedding_from_video(video_path, filename, output_folder, frame_rate=None):
+def extract_embedding_from_video(video_path, filename, output_folder, frame_rate=None, representation='cls'):
     # Define transformations
     transform = ToTensor()
     
@@ -46,9 +46,6 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     # Get the video's frame rate, total frames, width, height, channel
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    channel = 3
     
     if frame_rate == None:
         frame_rate = fps
@@ -58,8 +55,8 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     total_samples = (total_frames + frame_step - 1) // frame_step
     
     # Create holders
-    frames = np.zeros((total_samples, vit_dim_x, vit_dim_y))
-    samples = np.zeros((total_samples))
+    frames = np.zeros((total_samples, vit_dim))
+    samples = np.zeros((total_samples), dtype=np.int64)
 
     pbar = tqdm(total=total_samples)
     
@@ -84,10 +81,18 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
             features = features / features.norm(dim=-1, keepdim=True)
             # Apply Softmax with Torch
             features = torch.nn.functional.softmax(features, dim=-1)
+            
             if device == 'cuda':
-                frames[result_index] = features.detach().cpu().squeeze(0).numpy()
+                features = features.detach().cpu().squeeze(0)
             else:
-                frames[result_index] = features.squeeze(0).numpy()
+                features = features.squeeze(0)
+            
+            if representation == 'cls':
+                features = features[0]
+            else:
+                features = torch.mean(features, dim=0)
+            
+            frames[result_index] = features
             samples[result_index] = frame_index
         
         result_index += 1
@@ -100,13 +105,13 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     np.save(feature_file, frames)
     np.save(sample_file, samples)
     
-def extract_features(video_path, output_folder, frame_rate=None):
+def extract_features(video_path, output_folder, frame_rate=None, representation='cls'):
     # Extract features for each video file
     for filename in os.listdir(video_path):
         with torch.device(device):
             if filename.endswith('.mp4'):
-                extract_embedding_from_video(video_path, filename, output_folder, frame_rate)
-                # break
+                extract_embedding_from_video(video_path, filename, output_folder, frame_rate, representation)
+                break
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -115,9 +120,14 @@ if __name__ == '__main__':
                         help='Path to folder containing videos')
     parser.add_argument('--feature-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
-    parser.add_argument('--frame-rate', type=int,
+    parser.add_argument('--representation', type=str, default='cls',
+                        choices=['cls', 'mean'],
+                        help='visual type')
+    parser.add_argument('--frame-rate', type=int, 
                         help='Number of frames per second to sample from videos')
+
     args = parser.parse_args()
 
-    extract_features(args.video_folder, args.feature_folder, args.frame_rate)
+    extract_features(args.video_folder, args.feature_folder, 
+                     args.frame_rate, args.representation)
     print("--- %s seconds ---" % (time.time() - start_time))

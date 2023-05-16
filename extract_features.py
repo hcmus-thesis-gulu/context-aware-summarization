@@ -24,8 +24,8 @@ def extract_embedding(img):
         inputs = feature_extractor(images=img, return_tensors="pt")
         print('AFTER INPUTS')
         if device == 'cuda':
-            inputs.to(device)
             print('AFTER DEVICE', type(inputs))
+            inputs.to(device)
         outputs = model(**inputs)
         embeddings = outputs.last_hidden_state
 

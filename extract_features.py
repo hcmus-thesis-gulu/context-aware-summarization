@@ -26,10 +26,10 @@ def extract_embedding(img):
                 inputs.to(device)
             outputs = model(**inputs)
             embeddings = outputs.last_hidden_state
+        return embeddings   
 
-    if device == 'cuda':
-        return embeddings.detach().cpu()
-    return embeddings
+    # if device == 'cuda':
+    #     return embeddings.detach().cpu()
 
 
 def extract_features(video_path, output_folder, n_frames_per_second=None):
@@ -85,8 +85,10 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
                         features = features / features.norm(dim=-1, keepdim=True)
                         # Apply Softmax with Torch
                         features = torch.nn.functional.softmax(features, dim=-1)
-                        
-                        frames.append(features.squeeze(0).numpy())
+                        if device == 'cuda':
+                            frames.append(features.detach().cpu().squeeze(0).numpy())
+                        else:
+                            frames.append(features.squeeze(0).numpy())
                         samples.append(frame)
                         
                     pbar.update(1)

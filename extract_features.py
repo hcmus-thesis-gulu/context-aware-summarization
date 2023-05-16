@@ -50,18 +50,20 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
 
                 # Extract features for each frame of the video
                 cap = cv2.VideoCapture(video_file)
-                total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 # Get the video's frame rate
                 fps = cap.get(cv2.CAP_PROP_FPS)
 
                 frames = []
                 samples = []
-                pbar = tqdm(total=total_frame_count)
                 # Calculate the number of frames to skip between samples
                 if n_frames_per_second:
                     skip_frames = int(fps / n_frames_per_second)
                 else:
                     skip_frames = 1
+                
+                total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                total_frame_count = total_frame_count//skip_frames + int(total_frame_count % skip_frames != 0)
+                pbar = tqdm(total=total_frame_count)
                 
                 current_index = -1
                 while True:

@@ -15,13 +15,14 @@ import time
 feature_extractor = ViTFeatureExtractor.from_pretrained('facebook/dino-vitb16')
 model = ViTModel.from_pretrained('facebook/dino-vitb16')
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-feature_extractor.to(device)
 model.to(device)
 
 def extract_embedding(img):
     # Extract features
     with torch.no_grad():
         inputs = feature_extractor(images=img, return_tensors="pt")
+        if device == 'cuda':
+            inputs.cuda()
         outputs = model(**inputs)
         embeddings = outputs.last_hidden_state
 

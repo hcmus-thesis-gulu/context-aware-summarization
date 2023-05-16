@@ -62,13 +62,15 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
             else:
                 skip_frames = 1
             
+            current_index = -1
             while True:
                 ret, frame = cap.read()
                 if not ret:
                     break
+                current_index += 1
                 
                 # Randomly decide whether to keep this frame or not
-                if random.random() > 1.0 / skip_frames:
+                if current_index % skip_frames:
                     # Skip the frame
                     continue
 

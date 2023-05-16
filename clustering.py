@@ -166,15 +166,16 @@ def main():
             features = read_npy(feature_file)
             sample_file = os.path.join(feature_folder_path, f'{filename}_samples.npy')
             samples = read_npy(sample_file)
+            keyframes_file = filename + '_keyframes.npy'
+            scores_file = filename + '_scores.npy'
             
             print(f'Clustering {filename}')
-
+            if os.path.exists(keyframes_file) and os.path.exists(scores_file):
+                continue
             
             keyframe_idxs, scores = cluster_features(features, method, n_clusters)
             keyframes = samples[keyframe_idxs]
             
-            keyframes_file = filename + '_keyframes.npy'
-            scores_file = filename + '_scores.npy'
             
             keyframes_path = os.path.join(clustering_folder_path, keyframes_file)
             scores_path = os.path.join(clustering_folder_path, scores_file)

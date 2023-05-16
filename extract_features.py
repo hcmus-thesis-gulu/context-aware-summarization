@@ -30,7 +30,7 @@ def extract_embedding(img):
         embeddings = outputs.last_hidden_state
 
     if device == 'cuda':
-        return embeddings.detach().cpu().numpy()
+        return embeddings.detach().cpu()
     return embeddings
 
 

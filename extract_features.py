@@ -14,7 +14,7 @@ import time
 # Load DINO model and feature extractor
 feature_extractor = ViTFeatureExtractor.from_pretrained('facebook/dino-vitb16')
 model = ViTModel.from_pretrained('facebook/dino-vitb16')
-device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model.to(device)
 
 def extract_embedding(img):

@@ -66,7 +66,8 @@ def segment_frames(labels, window_size=5, min_seg_length=4):
                 # If go back to previous segment,
                 # the short one is relabeled with the previous label
                 if segments[-1][0] == label:
-                    segments[-1][2] = i
+                    # segments[-1][2] = i
+                    segments[-1] = (segments[-1][0], segments[-1][1], i)
                     start = i
                 
                 # If another segment encountered, divide the segment into two,
@@ -74,7 +75,8 @@ def segment_frames(labels, window_size=5, min_seg_length=4):
                 # while keeping the second one
                 else:
                     middle = (start + i) // 2
-                    segments[-1][2] = middle
+                    # segments[-1][2] = middle
+                    segments[-1] = (segments[-1][0], segments[-1][1], middle)
                     start = middle
             
             # Add the segment to the list of segments
@@ -128,6 +130,8 @@ def cluster_features(features, method, n_clusters, *args, **kwargs):
     else:
         raise ValueError('Invalid clustering method')
     features = l2_normalize_features(features)
+    nframes, width, height = features.shape
+    features = features.reshape((nframes, width*height))
     model.fit(features)
     labels = model.predict(features)
     
@@ -156,12 +160,15 @@ def main():
     n_clusters = args.num_clusters
 
     for feature_name in os.listdir(feature_folder_path):
-        if feature_name.endswith('.npy'):
+        if feature_name.endswith('.npy') and not feature_name.endswith('samples.npy'):
             filename = os.path.splitext(feature_name)[0]
             feature_file = os.path.join(feature_folder_path, feature_name)
             features = read_npy(feature_file)
             sample_file = os.path.join(feature_folder_path, f'{filename}_samples.npy')
             samples = read_npy(sample_file)
+            
+            print(f'Clustering {filename}')
+
             
             keyframe_idxs, scores = cluster_features(features, method, n_clusters)
             keyframes = samples[keyframe_idxs]

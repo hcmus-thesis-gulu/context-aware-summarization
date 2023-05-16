@@ -8,6 +8,7 @@ from transformers import ViTFeatureExtractor, ViTModel
 import cv2
 from tqdm import tqdm
 import random
+import time
 
 
 # Load DINO model and feature extractor
@@ -25,7 +26,7 @@ def extract_embedding(img):
     return embeddings
 
 
-def extract_features(video_path, output_folder, n_frames_per_second=1):
+def extract_features(video_path, output_folder, n_frames_per_second=None):
     # Define transformations
     transform = ToTensor()
     
@@ -37,6 +38,8 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
             video_file = os.path.join(video_path, filename)
             feature_file = os.path.join(output_folder, f'{video_name}.npy')
             sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
+            if os.path.exists(feature_file) and os.path.exists(sample_file):
+                continue
 
             # Extract features for each frame of the video
             cap = cv2.VideoCapture(video_file)
@@ -48,7 +51,11 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
             samples = []
             pbar = tqdm(total=total_frame_count)
             # Calculate the number of frames to skip between samples
-            skip_frames = int(fps / n_frames_per_second)
+            # skip_frames = int(fps / n_frames_per_second)
+            if n_frames_per_second:
+                skip_frames = int(fps / n_frames_per_second)
+            else:
+                skip_frames = 1
             
             while True:
                 ret, frame = cap.read()
@@ -88,13 +95,15 @@ def extract_features(video_path, output_folder, n_frames_per_second=1):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     parser = argparse.ArgumentParser(description='Extract DINO features from videos')
     parser.add_argument('--video-folder', type=str, required=True,
                         help='Path to folder containing videos')
     parser.add_argument('--feature-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
-    parser.add_argument('--frame-rate', type=int, required=True,
+    parser.add_argument('--frame-rate', type=int,
                         help='Number of frames per second to sample from videos')
     args = parser.parse_args()
 
     extract_features(args.video_folder, args.feature_folder, args.frame_rate)
+    print("--- %s seconds ---" % (time.time() - start_time))

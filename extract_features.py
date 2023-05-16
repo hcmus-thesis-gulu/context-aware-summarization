@@ -7,15 +7,15 @@ from torchvision.transforms import Compose, Resize, ToTensor, Normalize
 from transformers import ViTFeatureExtractor, ViTModel
 import cv2
 from tqdm import tqdm
-import random
 import time
-
 
 # Load DINO model and feature extractor
 feature_extractor = ViTFeatureExtractor.from_pretrained('facebook/dino-vitb16')
 model = ViTModel.from_pretrained('facebook/dino-vitb16')
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 model.to(device)
+
+vit_dim_x, vit_dim_y = 197, 768
 
 def extract_embedding(img):
     # Extract features
@@ -50,11 +50,12 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
 
                 # Extract features for each frame of the video
                 cap = cv2.VideoCapture(video_file)
-                # Get the video's frame rate
+                # Get the video's frame rate, width, height, channel
                 fps = cap.get(cv2.CAP_PROP_FPS)
+                width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                channel = 3
 
-                frames = []
-                samples = []
                 # Calculate the number of frames to skip between samples
                 if n_frames_per_second:
                     skip_frames = int(fps / n_frames_per_second)
@@ -63,40 +64,42 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
                 
                 total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
                 total_frame_count = total_frame_count//skip_frames + int(total_frame_count % skip_frames != 0)
+                
+                frames = np.zeros((total_frame_count, vit_dim_x, vit_dim_y))
+                samples = np.zeros((total_frame_count, height, width, channel))
                 pbar = tqdm(total=total_frame_count)
                 
-                current_index = -1
+                frame_index = -1
+                result_index = -1
                 while True:
                     ret, frame = cap.read()
                     if not ret:
                         break
-                    current_index += 1
-                    
-                    # Randomly decide whether to keep this frame or not
-                    if current_index % skip_frames:
+                    frame_index += 1
+                
+                    # Decide whether to keep this frame or not
+                    if frame_index % skip_frames:
                         # Skip the frame
                         continue
-
+                    result_index += 1
+                
                     # Convert frame to PyTorch tensor and extract features
-                    img = Image.fromarray(frame)
+                    img = Image.fromarray(frame, mode="RGB")
                     img = transform(img).unsqueeze(0)
                     with torch.no_grad():
                         features = extract_embedding(img)
-                        
+                        # features = torch.randn(1, 197, 768)
                         # L2 normalize features
                         features = features / features.norm(dim=-1, keepdim=True)
                         # Apply Softmax with Torch
                         features = torch.nn.functional.softmax(features, dim=-1)
                         if device == 'cuda':
-                            frames.append(features.detach().cpu().squeeze(0).numpy())
-                        else:
-                            frames.append(features.squeeze(0).numpy())
-                        samples.append(frame)
-                        
+                            features.detach().cpu()
+                        frames[result_index] = features.squeeze(0).numpy()
+                        samples[result_index] = frame
+
                     pbar.update(1)
-                
-                pbar.close()
-                
+
                 cap.release()
 
                 # Save feature embeddings to file
@@ -104,7 +107,10 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
                 np.save(feature_file, frames)
                 samples = np.array(samples)
                 np.save(sample_file, samples)
-
+                
+                pbar.close()
+                break
+                
 
 if __name__ == '__main__':
     start_time = time.time()

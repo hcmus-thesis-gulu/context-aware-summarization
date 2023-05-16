@@ -19,12 +19,13 @@ model.to(device)
 
 def extract_embedding(img):
     # Extract features
-    with torch.no_grad():
-        inputs = feature_extractor(images=img, return_tensors="pt")
-        if device == 'cuda':
-            inputs.to(device)
-        outputs = model(**inputs)
-        embeddings = outputs.last_hidden_state
+    with torch.device(device):
+        with torch.no_grad():
+            inputs = feature_extractor(images=img, return_tensors="pt")
+            if device == 'cuda':
+                inputs.to(device)
+            outputs = model(**inputs)
+            embeddings = outputs.last_hidden_state
 
     if device == 'cuda':
         return embeddings.detach().cpu()
@@ -37,68 +38,68 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
     
     # Extract features for each video file
     for filename in os.listdir(video_path):
-        if filename.endswith('.mp4'):
-            print(f'Extracting features for {filename}')
-            video_name = os.path.splitext(filename)[0]
-            video_file = os.path.join(video_path, filename)
-            feature_file = os.path.join(output_folder, f'{video_name}.npy')
-            sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
-            if os.path.exists(feature_file) and os.path.exists(sample_file):
-                continue
-
-            # Extract features for each frame of the video
-            cap = cv2.VideoCapture(video_file)
-            total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            # Get the video's frame rate
-            fps = cap.get(cv2.CAP_PROP_FPS)
-
-            frames = []
-            samples = []
-            pbar = tqdm(total=total_frame_count)
-            # Calculate the number of frames to skip between samples
-            # skip_frames = int(fps / n_frames_per_second)
-            if n_frames_per_second:
-                skip_frames = int(fps / n_frames_per_second)
-            else:
-                skip_frames = 1
-            
-            current_index = -1
-            while True:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                current_index += 1
-                
-                # Randomly decide whether to keep this frame or not
-                if current_index % skip_frames:
-                    # Skip the frame
+        with torch.device(device):
+            if filename.endswith('.mp4'):
+                print(f'Extracting features for {filename}')
+                video_name = os.path.splitext(filename)[0]
+                video_file = os.path.join(video_path, filename)
+                feature_file = os.path.join(output_folder, f'{video_name}.npy')
+                sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
+                if os.path.exists(feature_file) and os.path.exists(sample_file):
                     continue
 
-                # Convert frame to PyTorch tensor and extract features
-                img = Image.fromarray(frame)
-                img = transform(img).unsqueeze(0)
-                with torch.no_grad():
-                    features = extract_embedding(img)
-                    
-                    # L2 normalize features
-                    features = features / features.norm(dim=-1, keepdim=True)
-                    # Apply Softmax with Torch
-                    features = torch.nn.functional.softmax(features, dim=-1)
-                    
-                    frames.append(features.squeeze(0).numpy())
-                    samples.append(frame)
-                    
-                pbar.update(1)
-            
-            pbar.close()
-            
-            cap.release()
+                # Extract features for each frame of the video
+                cap = cv2.VideoCapture(video_file)
+                total_frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                # Get the video's frame rate
+                fps = cap.get(cv2.CAP_PROP_FPS)
 
-            # Save feature embeddings to file
-            frames = np.array(frames)
-            np.save(feature_file, frames)
-            samples = np.array(samples)
-            np.save(sample_file, samples)
+                frames = []
+                samples = []
+                pbar = tqdm(total=total_frame_count)
+                # Calculate the number of frames to skip between samples
+                if n_frames_per_second:
+                    skip_frames = int(fps / n_frames_per_second)
+                else:
+                    skip_frames = 1
+                
+                current_index = -1
+                while True:
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                    current_index += 1
+                    
+                    # Randomly decide whether to keep this frame or not
+                    if current_index % skip_frames:
+                        # Skip the frame
+                        continue
+
+                    # Convert frame to PyTorch tensor and extract features
+                    img = Image.fromarray(frame)
+                    img = transform(img).unsqueeze(0)
+                    with torch.no_grad():
+                        features = extract_embedding(img)
+                        
+                        # L2 normalize features
+                        features = features / features.norm(dim=-1, keepdim=True)
+                        # Apply Softmax with Torch
+                        features = torch.nn.functional.softmax(features, dim=-1)
+                        
+                        frames.append(features.squeeze(0).numpy())
+                        samples.append(frame)
+                        
+                    pbar.update(1)
+                
+                pbar.close()
+                
+                cap.release()
+
+                # Save feature embeddings to file
+                frames = np.array(frames)
+                np.save(feature_file, frames)
+                samples = np.array(samples)
+                np.save(sample_file, samples)
 
 
 if __name__ == '__main__':

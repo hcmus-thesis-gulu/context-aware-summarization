@@ -94,7 +94,7 @@ def extract_features(video_path, output_folder, n_frames_per_second=None):
                         # Apply Softmax with Torch
                         features = torch.nn.functional.softmax(features, dim=-1)
                         if device == 'cuda':
-                            features.detach().cpu()
+                            features = features.detach().cpu()
                         frames[result_index] = features.squeeze(0).numpy()
                         samples[result_index] = frame
 

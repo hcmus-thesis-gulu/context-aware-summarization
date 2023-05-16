@@ -22,7 +22,7 @@ def extract_embedding(img):
     with torch.no_grad():
         print('BEFORE INPUTS')
         inputs = feature_extractor(images=img, return_tensors="pt")
-        print('AFTER INPUTS', device)
+        print('AFTER INPUTS', type(device))
         if device == 'cuda':
             print('AFTER DEVICE', type(inputs))
             inputs.to(device)

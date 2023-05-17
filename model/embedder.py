@@ -10,6 +10,9 @@ class DINOEmbedder:
         self.device = device
         self.emb_dim = 768
         
+        print(f'Loading DINO model from {self.model_path}...')
+        print(f'Using {self.device} device')
+        
         self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.model_path)
         self.model = ViTModel.from_pretrained(self.model_path)
         

@@ -83,6 +83,7 @@ def extract_embedding_from_path(video_path, output_folder,
             extract_embedding_from_video(video_path, filename, output_folder,
                                          embedder, frame_rate)
 
+
 if __name__ == '__main__':
     start_time = time.time()
     parser = argparse.ArgumentParser(description='Extract DINO features from videos')
@@ -98,6 +99,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    extract_embedding_from_path(args.video_folder, args.feature_folder, 
-                     args.frame_rate, args.representation)
+    extract_embedding_from_path(args.video_folder, args.feature_folder,
+                                args.frame_rate, args.representation)
     print("--- %s seconds ---" % (time.time() - start_time))

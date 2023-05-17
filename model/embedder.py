@@ -23,7 +23,7 @@ class DINOEmbedder:
                                             return_tensors="pt")
             
             outputs = self.model(**inputs.to(self.device))
-            features = outputs.detach().last_hidden_state.squeeze(0)
+            features = outputs.last_hidden_state.detach().squeeze(0)
         
         # L2 normalize features
         features = features / features.norm(dim=-1, keepdim=True)

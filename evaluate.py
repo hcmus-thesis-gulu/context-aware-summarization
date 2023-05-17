@@ -1,15 +1,15 @@
 import h5py
 import numpy as np
+import scipy.io
 
-data_path = 'eccv16_dataset_summe_google_pool5.h5'
+
+data_path = 'data/eccv16_dataset_summe_google_pool5.h5'
 
 with h5py.File(data_path, "r") as hdf:
     for name, vid in hdf.items():
         user_summary = np.array(vid['user_summary'])
         break
 
-import scipy.io 
-import numpy as np
 
 groundtruth_file = 'data/GT/Air_Force_One.mat'
 groundtruth_data = scipy.io.loadmat(groundtruth_file)
@@ -40,6 +40,7 @@ print(selected_keyframes.sum(), keyframe_indexes.shape)
 
 # for i in range(total_frames):
     # print(selected_keyframes[i])
+
 
 def evaluate_summary(predicted_summary, user_summary, eval_method):
     """ Compare the predicted summary with the user defined one(s).
@@ -74,6 +75,7 @@ def evaluate_summary(predicted_summary, user_summary, eval_method):
         return max(f_scores)
     else:
         return sum(f_scores)/len(f_scores)
+
 
 f_score = evaluate_summary(predicted_summary=selected_keyframes, 
                            user_summary=user_summary, eval_method='max')

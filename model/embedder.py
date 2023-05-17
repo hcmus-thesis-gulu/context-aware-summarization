@@ -3,11 +3,11 @@ from transformers import ViTFeatureExtractor, ViTModel
 
 
 class DINOEmbedder:
-    def __init__(self, feature_type='cls', model_name='b16', device='cpu'):
+    def __init__(self, representation='cls', model_name='b16', device='cpu'):
         # Load DINO model and feature extractor
-        self.feature_type = feature_type
+        self.feature_type = representation
         self.model_path = f'facebook/dino-vit{model_name}'
-        self.device = device
+        self.device = 'cuda' if (torch.cuda.is_available() and device == 'cuda') else 'cpu'
         self.emb_dim = 768
         
         print(f'Loading DINO model from {self.model_path}...')

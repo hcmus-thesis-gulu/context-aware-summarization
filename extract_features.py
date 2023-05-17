@@ -74,8 +74,12 @@ def extract_embedding_from_video(video_path, filename, output_folder,
     
 
 def extract_embedding_from_path(video_path, output_folder,
-                                frame_rate=None, representation='cls'):
-    embedder = DINOEmbedder(representation)
+                                frame_rate=None, representation='cls',
+                                model_name='b16', device='cuda'):
+    embedder = DINOEmbedder(representation,
+                            model_name,
+                            device
+                            )
     
     # Extract features for each video file
     for filename in os.listdir(video_path):
@@ -91,14 +95,24 @@ if __name__ == '__main__':
                         help='Path to folder containing videos')
     parser.add_argument('--feature-folder', type=str, required=True,
                         help='Path to folder to store feature embeddings')
+    
     parser.add_argument('--representation', type=str, default='cls',
                         choices=['cls', 'mean'],
                         help='visual type')
     parser.add_argument('--frame-rate', type=int, 
                         help='Number of frames per second to sample from videos')
+    
+    parser.add_argument('--model-name', type=str, default='b16',
+                        choices=['b16', 'b8', 's16', 's8']
+                        help='Name of the DINO model')
+    parser.add_argument('--device', type=str, default='cuda',
+                        choices=['cuda', 'cpu'],
+                        help='Device to run the model on')
 
     args = parser.parse_args()
 
     extract_embedding_from_path(args.video_folder, args.feature_folder,
-                                args.frame_rate, args.representation)
+                                args.frame_rate, args.representation,
+                                args.model_name, args.device
+                                )
     print("--- %s seconds ---" % (time.time() - start_time))

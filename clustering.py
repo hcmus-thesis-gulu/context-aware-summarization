@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 from sklearn.cluster import KMeans
 from sklearn.mixture import GaussianMixture
-
+import time
 
 def read_npy(features_path):
     return np.load(features_path)
@@ -132,7 +132,6 @@ def cluster_features(features, method, n_clusters, *args, **kwargs):
     features = l2_normalize_features(features)
     # nframes, width, height = features.shape
     # features = features.reshape((nframes, width*height))
-    print(np.isnan(features[-1]))
     model.fit(features)
     labels = model.predict(features)
     
@@ -181,7 +180,7 @@ def main():
             
             np.save(keyframes_path, keyframes)
             np.save(scores_path, scores)
-            break
-
 if __name__ == '__main__':
+    start_time = time.time()
     main()
+    print("--- %s seconds ---" % (time.time() - start_time))

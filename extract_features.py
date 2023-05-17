@@ -54,7 +54,7 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     
     # Extract features for each frame of the video
     cap = cv2.VideoCapture(video_file)
-    # Get the video's frame rate, total frames, width, height, channel
+    # Get the video's frame rate, total frames
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     total_frames = count_frames(video_file)
     # int(cap.get(cv2.CAP_PROP_FRAME_COUNT))

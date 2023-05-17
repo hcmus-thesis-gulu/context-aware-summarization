@@ -57,7 +57,7 @@ def segment_frames(labels, window_size=5, min_seg_length=4):
         if i == 0:
             current_label = label
         elif i == len(labels) - 1:
-            segments.append((current_label, start, i))
+            segments.append((current_label, start, i+1))
         elif label != current_label:
             # Handle short segments
             if len(segments) > 0 and i - start < min_seg_length:
@@ -130,8 +130,9 @@ def cluster_features(features, method, n_clusters, *args, **kwargs):
     else:
         raise ValueError('Invalid clustering method')
     features = l2_normalize_features(features)
-    nframes, width, height = features.shape
-    features = features.reshape((nframes, width*height))
+    # nframes, width, height = features.shape
+    # features = features.reshape((nframes, width*height))
+    print(np.isnan(features[-1]))
     model.fit(features)
     labels = model.predict(features)
     
@@ -168,20 +169,19 @@ def main():
             samples = read_npy(sample_file)
             keyframes_file = filename + '_keyframes.npy'
             scores_file = filename + '_scores.npy'
+            keyframes_path = os.path.join(clustering_folder_path, keyframes_file)
+            scores_path = os.path.join(clustering_folder_path, scores_file)
             
-            print(f'Clustering {filename}')
-            if os.path.exists(keyframes_file) and os.path.exists(scores_file):
+            print(f'Clustering frames of {filename}')
+            if os.path.exists(keyframes_path) and os.path.exists(scores_path):
                 continue
             
             keyframe_idxs, scores = cluster_features(features, method, n_clusters)
             keyframes = samples[keyframe_idxs]
             
-            
-            keyframes_path = os.path.join(clustering_folder_path, keyframes_file)
-            scores_path = os.path.join(clustering_folder_path, scores_file)
-            
             np.save(keyframes_path, keyframes)
             np.save(scores_path, scores)
+            break
 
 if __name__ == '__main__':
     main()

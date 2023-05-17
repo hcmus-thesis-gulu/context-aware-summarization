@@ -28,6 +28,17 @@ def extract_embedding_from_image(image):
             embeddings = outputs.last_hidden_state
         return embeddings   
 
+def count_frames(video_path):
+    video = cv2.VideoCapture(video_path)
+    count = 0
+    while True:
+        ret, _ = video.read()
+        if not ret:
+            break
+        count += 1
+    video.release()
+    return count
+    
 def extract_embedding_from_video(video_path, filename, output_folder, frame_rate=None, representation='cls'):
     # Define transformations
     transform = ToTensor()
@@ -45,7 +56,8 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     cap = cv2.VideoCapture(video_file)
     # Get the video's frame rate, total frames, width, height, channel
     fps = int(cap.get(cv2.CAP_PROP_FPS))
-    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frames = count_frames(video_file)
+    # int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
     if frame_rate == None:
         frame_rate = fps

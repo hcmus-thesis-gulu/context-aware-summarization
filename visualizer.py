@@ -55,7 +55,9 @@ def visualize_video(video_folder, feature_folder, clustering_folder, demo_folder
         print(e)
         print(f'{video_name} not found')
   
-def visualize_cluster(video_folder, feature_folder, clustering_folder, video_name):
+def visualize_cluster(video_folder, feature_folder,
+                      clustering_folder, video_name,
+                      show_image=False):
     sample_file = os.path.join(feature_folder, f'{video_name}_samples.npy')
     feature_file = os.path.join(feature_folder, f'{video_name}.npy')
     keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')  
@@ -74,36 +76,38 @@ def visualize_cluster(video_folder, feature_folder, clustering_folder, video_nam
     # Plot the transformed data
     fig, ax = plt.subplots()
     ax.margins(tight=True)
-    ax.scatter(features_tsne[:, 0], features_tsne[:, 1])
+    ax.scatter(features_tsne[:, 0], features_tsne[:, 1],
+               c=sample_indexes, cmap='rainbow', alpha=0.6)
     
-    video = cv.VideoCapture(video_file)
-    
-    frame_index = 0
-    feature_index = 0
-    while True:
-        ret, frame = video.read()
-        if not ret:
-            break
+    if show_image:
+        video = cv.VideoCapture(video_file)
         
-        if frame_index in sample_indexes:
-            props = dict(edgecolor='red', linewidth=1)
-            if frame_index not in keyframe_indexes:
-                frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-                props = None
+        frame_index = 0
+        feature_index = 0
+        while True:
+            ret, frame = video.read()
+            if not ret:
+                break
             
-            imagebox = offsetbox.AnnotationBbox(
-              offsetbox.OffsetImage(frame, zoom=0.02),
-              features_tsne[feature_index],
-              bboxprops=props
-            )
+            if frame_index in sample_indexes:
+                props = dict(edgecolor='red', linewidth=1)
+                if frame_index not in keyframe_indexes:
+                    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                    props = None
+                
+                imagebox = offsetbox.AnnotationBbox(
+                offsetbox.OffsetImage(frame, zoom=0.02),
+                features_tsne[feature_index],
+                bboxprops=props
+                )
+                
+                ax.add_artist(imagebox)
+                feature_index += 1
+                pbar.update(1)
             
-            ax.add_artist(imagebox)
-            feature_index += 1
-            pbar.update(1)
-          
-        frame_index += 1
-    pbar.close()
-    plt.show()
+            frame_index += 1
+        pbar.close()
+        plt.show()
     # except Exception as e:
     #   print(e)
 
@@ -123,6 +127,8 @@ def main():
                         help='visual type')
     parser.add_argument('--video-name', type=str, help='video name')
     parser.add_argument('--fps', type=int, help='video fps')
+    parser.add_argument('--show-image', action='store_true',
+                        help='show image in cluster')
 
     args = parser.parse_args()
     
@@ -130,7 +136,8 @@ def main():
         visualize_cluster(video_folder=args.video_folder,
                           feature_folder=args.feature_folder,
                           clustering_folder=args.clustering_folder,
-                          video_name=args.video_name)
+                          video_name=args.video_name,
+                          show_image=args.show_image)
     else:
         visualize_video(video_folder=args.video_folder,
                         feature_folder=args.feature_folder,

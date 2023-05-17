@@ -103,7 +103,7 @@ if __name__ == '__main__':
                         help='Number of frames per second to sample from videos')
     
     parser.add_argument('--model-name', type=str, default='b16',
-                        choices=['b16', 'b8', 's16', 's8']
+                        choices=['b16', 'b8', 's16', 's8'],
                         help='Name of the DINO model')
     parser.add_argument('--device', type=str, default='cuda',
                         choices=['cuda', 'cpu'],

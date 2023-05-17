@@ -9,7 +9,7 @@ class Clusterer:
         self.num_clusters = num_clusters
         
         if self.method == 'kmeans':
-            self.model = KMeans(n_clusters=self.num_clusters)
+            self.model = KMeans(n_clusters=self.num_clusters, n_init='auto')
         elif self.method == 'dbscan':
             self.model = DBSCAN(eps=0.5, min_samples=10)
         elif self.method == 'gaussian':

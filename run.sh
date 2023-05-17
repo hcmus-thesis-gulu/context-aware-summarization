@@ -7,10 +7,20 @@ if [ $# -ne 2 ]; then
 fi
 
 # Create features and clustering folders inside output folder
-mkdir -p $2/features $2/clustering
+mkdir -p "$2/embeddings" "$2/clustering"
 
 # Run feature extraction script with arguments
-python extract_features.py --video-folder $1 --feature-folder $2/features
+python extractor.py \
+--video-folder "$1" \
+--embedding-folder "$2/embeddings" \
+--frame-rate 1 \
+--representation cls
 
 # Run clustering script with arguments
-python clustering.py --video-folder $1 --feature-folder $2/features --clustering-folder $2/clustering --method kmeans --num-clusters 10
+python clustering.py \
+--embedding-folder "$2/embeddings" \
+--clustering-folder "$2/clustering" \
+--method kmeans \
+--num-clusters 10 \
+--window-size 10 \
+--min-seg-length 10

@@ -19,15 +19,15 @@ def count_frames(video_path):
     return fps, count
     
 
-def mean_features(features):
-    return np.mean(features, axis=0)
+def mean_embeddings(embeddings):
+    return np.mean(embeddings, axis=0)
 
 
 # Compute the cosine similarity between set of features and its mean
-def similarity_score(features, mean=None):
+def similarity_score(embeddings, mean=None):
     if mean is None:
-        mean = mean_features(features)
+        mean = mean_embeddings(embeddings)
     
-    return np.dot(features, mean) / (np.linalg.norm(features) *
-                                     np.linalg.norm(mean)
-                                     )
+    return np.dot(embeddings, mean) / (np.linalg.norm(embeddings) *
+                                       np.linalg.norm(mean)
+                                       )

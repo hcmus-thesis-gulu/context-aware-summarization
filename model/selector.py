@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.mixture import GaussianMixture
-from model.utils import mean_features, similarity_score
+from model.utils import mean_embeddings, similarity_score
 
 class Clusterer:
     def __init__(self, method, num_clusters=10):
@@ -98,16 +98,16 @@ class Selector:
 
     # For each segment, compute the mean features and
     # similarity of all features with the mean
-    def segment_score(self, features, segments):
+    def segment_score(self, embeddings, segments):
         segment_scores = []
         segment_keyframes = []
         
         for _, start, end in segments:
             # Get the associated features
-            segment_features = features[start:end]
+            segment_features = embeddings[start:end]
             
             # Calculate the similarity with mean
-            mean = mean_features(segment_features)
+            mean = mean_embeddings(segment_features)
             score = similarity_score(segment_features, mean)
             segment_scores.extend(score.tolist())
             
@@ -117,8 +117,8 @@ class Selector:
         
         return np.asarray(segment_keyframes), np.asarray(segment_scores)
 
-    def select(self, labels, features):
+    def select(self, labels, embeddings):
         segments = self.segment_frames(labels)
-        keyframes, scores = self.segment_score(features, segments)
+        keyframes, scores = self.segment_score(embeddings, segments)
         
         return keyframes, scores

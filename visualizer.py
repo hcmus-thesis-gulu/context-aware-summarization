@@ -92,14 +92,14 @@ def visualize_cluster(video_folder, feature_folder,
             if frame_index in sample_indexes:
                 props = dict(edgecolor='red', linewidth=1)
                 if frame_index not in keyframe_indexes:
-                    frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+                    frame = cv.cvtColor(frame,
+                                        cv.COLOR_BGR2GRAY
+                                        )
                     props = None
                 
-                imagebox = offsetbox.AnnotationBbox(
-                offsetbox.OffsetImage(frame, zoom=0.02),
-                features_tsne[feature_index],
-                bboxprops=props
-                )
+                imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(frame, zoom=0.02),
+                                                    features_tsne[feature_index],
+                                                    bboxprops=props)
                 
                 ax.add_artist(imagebox)
                 feature_index += 1
@@ -107,7 +107,8 @@ def visualize_cluster(video_folder, feature_folder,
             
             frame_index += 1
         pbar.close()
-        plt.show()
+        
+    plt.show()
     # except Exception as e:
     #   print(e)
 

@@ -3,30 +3,12 @@ import os
 import torch
 import numpy as np
 from torchvision.transforms import ToTensor
-from transformers import ViTFeatureExtractor, ViTModel
+from models.embedder import DINOEmbedder
 import cv2
 from tqdm import tqdm
 import time
 from PIL import Image
 
-# Load DINO model and feature extractor
-feature_extractor = ViTFeatureExtractor.from_pretrained('facebook/dino-vitb16')
-model = ViTModel.from_pretrained('facebook/dino-vitb16')
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
-model.to(device)
-
-vit_dim = 768
-
-def extract_embedding_from_image(image):
-    # Extract features
-    with torch.device(device):
-        with torch.no_grad():
-            inputs = feature_extractor(images=image, return_tensors="pt")
-            if device == 'cuda':
-                inputs.to(device)
-            outputs = model(**inputs)
-            embeddings = outputs.last_hidden_state
-        return embeddings   
 
 def count_frames(video_path):
     video = cv2.VideoCapture(video_path)
@@ -39,7 +21,8 @@ def count_frames(video_path):
     video.release()
     return count
     
-def extract_embedding_from_video(video_path, filename, output_folder, frame_rate=None, representation='cls'):
+def extract_embedding_from_video(video_path, filename, output_folder,
+                                 frame_rate=None, embedder=embedder):
     # Define transformations
     transform = ToTensor()
     
@@ -67,7 +50,7 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     total_samples = (total_frames + frame_step - 1) // frame_step
     
     # Create holders
-    frames = np.zeros((total_samples, vit_dim))
+    frames = np.zeros((total_samples, embedder.emb_dim))
     samples = np.zeros((total_samples), dtype=np.int64)
 
     pbar = tqdm(total=total_samples)
@@ -86,26 +69,10 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
         # Convert frame to PyTorch tensor and extract features
         img = Image.fromarray(frame, mode="RGB")
         img = transform(img).unsqueeze(0)
-        with torch.no_grad():
-            features = extract_embedding_from_image(img)
-            # features = torch.randn(1, 197, 768)
-            # L2 normalize features
-            features = features / features.norm(dim=-1, keepdim=True)
-            # Apply Softmax with Torch
-            features = torch.nn.functional.softmax(features, dim=-1)
-            
-            if device == 'cuda':
-                features = features.detach().cpu().squeeze(0)
-            else:
-                features = features.squeeze(0)
-            
-            if representation == 'cls':
-                features = features[0]
-            else:
-                features = torch.mean(features, dim=0)
-            
-            frames[result_index] = features
-            samples[result_index] = frame_index
+        embedding = embedder.image_embedding(img)
+        
+        frames[result_index] = embedding
+        samples[result_index] = frame_index
         
         result_index += 1
         frame_index += 1
@@ -117,12 +84,15 @@ def extract_embedding_from_video(video_path, filename, output_folder, frame_rate
     np.save(feature_file, frames)
     np.save(sample_file, samples)
     
-def extract_features(video_path, output_folder, frame_rate=None, representation='cls'):
+def extract_features(video_path, output_folder,
+                     frame_rate=None, representation='cls'):
+    embedder = DINOEmbedder(representation)
+    
     # Extract features for each video file
     for filename in os.listdir(video_path):
-        with torch.device(device):
-            if filename.endswith('.mp4'):
-                extract_embedding_from_video(video_path, filename, output_folder, frame_rate, representation)
+        if filename.endswith('.mp4'):
+            extract_embedding_from_video(video_path, filename, output_folder,
+                                         frame_rate, embedder)
 
 if __name__ == '__main__':
     start_time = time.time()

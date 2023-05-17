@@ -59,12 +59,14 @@ def visualize_cluster(video_folder, embedding_folder,
                       num_components, show_image=False):
     sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     embedding_file = os.path.join(embedding_folder, f'{video_name}.npy')
-    keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')  
+    keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
+    label_file = os.path.join(clustering_folder, f'{video_name}_labels.npy')
     video_file = os.path.join(video_folder, f'{video_name}.mp4')
     
     # try:
     sample_idxs = np.load(sample_file)
     keyframe_idxs = np.load(keyframe_file)
+    labels = np.load(label_file)
     
     # Fit and transform the data
     embeddings = np.load(embedding_file)
@@ -76,7 +78,7 @@ def visualize_cluster(video_folder, embedding_folder,
     fig, ax = plt.subplots()
     ax.margins(tight=True)
     ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
-               c=sample_idxs, cmap='rainbow', alpha=0.6)
+               c=labels, cmap='rainbow', alpha=0.6)
     
     if show_image:
         video = cv.VideoCapture(video_file)

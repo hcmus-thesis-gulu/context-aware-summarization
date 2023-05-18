@@ -17,9 +17,12 @@ class Clusterer:
             metric = distance_metric(distance)
             self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
         elif self.method == 'agglo':
-            print(f"Using {distance} distance metric for Agglomerative Clustering")
+            linkage = 'ward' if distance == 'euclidean' else 'average'
+            print(f"Using {distance} distance metric and {linkage} linkage for Agglomerative Clustering")
             self.model = AgglomerativeClustering(n_clusters=self.num_clusters,
-                                                 metric=distance)
+                                                 metric=distance,
+                                                 linkage=linkage
+                                                 )
         elif self.method == 'gaussian':
             print(f"Using Bayesian inference for Gaussian Mixture Model")
             self.model = BayesianGaussianMixture(n_components=self.num_clusters)

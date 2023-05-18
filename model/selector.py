@@ -10,15 +10,18 @@ class Clusterer:
         self.num_clusters = num_clusters
         
         if self.method == 'kmeans':
+            print(f"Using K-Means")
             self.model = KMeans(n_clusters=self.num_clusters, n_init='auto')
         elif self.method == 'dbscan':
             print(f"Using {distance} distance metric for DBSCAN")
             metric = distance_metric(distance)
             self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
         elif self.method == 'agglo':
+            print(f"Using {distance} distance metric for Agglomerative Clustering")
             self.model = AgglomerativeClustering(n_clusters=self.num_clusters,
                                                  metric=distance)
         elif self.method == 'gaussian':
+            print(f"Using Bayesian inference for Gaussian Mixture Model")
             self.model = BayesianGaussianMixture(n_components=self.num_clusters)
         else:
             raise ValueError('Invalid clustering method')

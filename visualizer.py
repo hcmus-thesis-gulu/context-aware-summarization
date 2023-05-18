@@ -56,8 +56,7 @@ def visualize_video(video_folder, embedding_folder, clustering_folder, demo_fold
 
 def visualize_cluster(video_folder, embedding_folder,
                       clustering_folder, video_name,
-                      num_components, color_value,
-                      show_image=False):
+                      color_value, show_image=False):
     sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     embedding_file = os.path.join(embedding_folder, f'{video_name}.npy')
     keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
@@ -107,9 +106,10 @@ def visualize_cluster(video_folder, embedding_folder,
                     props = None
                 
                 imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(frame, zoom=0.02),
-                                                    pad=0, borderpad=0,
                                                     reduced_embeddings[embedding_idx],
-                                                    bboxprops=props)
+                                                    bboxprops=props,
+                                                    pad=0.1, borderpad=0
+                                                    )
                 
                 ax.add_artist(imagebox)
                 embedding_idx += 1
@@ -139,8 +139,6 @@ def main():
                         choices=['cluster', 'video'],
                         help='visual type')
     parser.add_argument('--output-fps', type=int, help='video fps')
-    parser.add_argument('--intermediate-components', type=int, default=64,
-                        help='number of intermediate components')
     parser.add_argument('--show-image', action='store_true',
                         help='show image in cluster')
     parser.add_argument('--color-value', type=str, default='index',
@@ -154,7 +152,6 @@ def main():
                           embedding_folder=args.embedding_folder,
                           clustering_folder=args.clustering_folder,
                           video_name=args.video_name,
-                          num_components=args.intermediate_components,
                           show_image=args.show_image,
                           color_value=args.color_value
                           )

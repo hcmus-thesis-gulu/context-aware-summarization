@@ -20,8 +20,8 @@ python extractor.py \
 python clustering.py \
 --embedding-folder "$2/embeddings" \
 --clustering-folder "$2/clustering" \
---method kmeans \
---num-clusters 10 \
---window-size 10 \
---min-seg-length 10 \
---distance jensenshannon
+--method agglo \
+--num-clusters 6 \
+--window-size 5 \
+--min-seg-length 3 \
+--distance cosine

@@ -11,7 +11,9 @@ class Reducer:
         
         self.pre_reducer = PCA(n_components=self.intermediate_components)
         self.reducer = TSNE(n_components=self.num_components,
-                            perplexity=self.perplexity)
+                            perplexity=self.perplexity,
+                            metric='cosine'
+                            )
 
     def reduce(self, embeddings):
         reduced_embeddings = self.pre_reducer.fit_transform(embeddings)

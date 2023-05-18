@@ -49,8 +49,8 @@ def visualize_video(video_folder, embedding_folder, clustering_folder, demo_fold
         keyframes = np.load(keyframe_file)
         broadcast_video(raw_video_path=raw_video_path, frame_indexes=keyframes, 
                         output_path=keyframe_video_path, fps=fps)
-    except Exception as e:
-        print(e)
+    except Exception as error:
+        print(error)
         print(f'{video_name} not found')
 
 
@@ -67,18 +67,21 @@ def visualize_cluster(video_folder, embedding_folder,
     sample_idxs = np.load(sample_file)
     keyframe_idxs = np.load(keyframe_file)
     labels = np.load(label_file)
-    
-    # Fit and transform the data
     embeddings = np.load(embedding_file)
     
+    # Fit and transform the data
     reducer = Reducer(intermediate_components=num_components)
     reduced_embeddings = reducer.reduce(embeddings)
     
     # Plot the transformed data
     fig, ax = plt.subplots()
     ax.margins(tight=True)
-    ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
-               c=labels, cmap='rainbow', alpha=0.6)
+    sc = ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
+                    c=sample_idxs, cmap='rainbow', alpha=0.6)
+    ax.set_ylabel('1st t-SNE dim')
+    ax.set_xlabel('2nd t-SNE dim')
+    cbar = fig.colorbar(sc)
+    cbar.set_label("Sample idxs")
     
     if show_image:
         video = cv.VideoCapture(video_file)

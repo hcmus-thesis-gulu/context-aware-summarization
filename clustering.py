@@ -71,7 +71,7 @@ def main():
     parser.add_argument('--min-seg-length', type=int, default=10,
                         help='minimum segment length')
     parser.add_argument('--distance', type=str, default='euclidean',
-                        choices=['chi2', 'jensenshannon', 'euclidean', 'cosine'],
+                        choices=['jensenshannon', 'euclidean', 'cosine'],
                         help='distance metric for clustering')
     
     args = parser.parse_args()

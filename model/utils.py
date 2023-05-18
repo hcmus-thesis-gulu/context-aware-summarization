@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 # Probability distribution distance
-from sklearn.metrics.pairwise import chi2_kernel, cosine_distances, euclidean_distances
+from sklearn.metrics.pairwise import cosine_distances, euclidean_distances
 from scipy.spatial.distance import jensenshannon
 
 
@@ -27,9 +27,7 @@ def mean_embeddings(embeddings):
 
 
 def distance_metric(distance):
-    if distance == 'chi2':
-        return chi2_kernel
-    elif distance == 'jensenshannon':
+    if distance == 'jensenshannon':
         return jensenshannon
     elif distance == 'euclidean':
         return euclidean_distances

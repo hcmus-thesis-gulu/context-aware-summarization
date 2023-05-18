@@ -12,7 +12,7 @@ def read_npy(features_path):
 def cluster_embeddings(features, method, n_clusters,
                        window_size, min_seg_length,
                        distance):
-    clusterer = Clusterer(method, n_clusters, distance)
+    clusterer = Clusterer(method, distance, n_clusters)
     selector = Selector(window_size, min_seg_length)
     labels = clusterer.cluster(features)
     

@@ -100,7 +100,7 @@ def visualize_cluster(video_folder, embedding_folder,
                     props = None
                 
                 imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(frame, zoom=0.02),
-                                                    features_tsne[embedding_idx],
+                                                    reduced_embeddings[embedding_idx],
                                                     bboxprops=props)
                 
                 ax.add_artist(imagebox)
@@ -130,7 +130,7 @@ def main():
     parser.add_argument('--visual-type', type=str, default='cluster',
                         choices=['cluster', 'video'],
                         help='visual type')
-    parser.add_argument('--fps', type=int, help='video fps')
+    parser.add_argument('--output-fps', type=int, help='video fps')
     parser.add_argument('--intermediate-components', type=int, default=64,
                         help='number of intermediate components')
     parser.add_argument('--show-image', action='store_true',
@@ -151,7 +151,7 @@ def main():
                         clustering_folder=args.clustering_folder,
                         demo_folder=args.demo_folder,
                         video_name=args.video_name,
-                        fps=args.fps)
+                        fps=args.output_fps)
 
 
 if __name__ == '__main__':

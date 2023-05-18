@@ -17,5 +17,5 @@ python visualizer.py \
 --demo-folder "$2/demo" \
 --video-name "$3" \
 --visual-type cluster \
---fps 4 \
+--output-fps 4 \
 --intermediate-components 50

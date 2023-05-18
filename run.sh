@@ -13,7 +13,7 @@ mkdir -p "$2/embeddings" "$2/clustering"
 python extractor.py \
 --video-folder "$1" \
 --embedding-folder "$2/embeddings" \
---frame-rate 1 \
+--frame-rate 4 \
 --representation cls
 
 # Run clustering script with arguments

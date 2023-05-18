@@ -16,7 +16,7 @@ def cluster_embeddings(embeddings, method, n_clusters,
     selector = Selector(window_size, min_seg_length)
     labels = clusterer.cluster(embeddings)
     
-    return labels, selector.select(labels, embeddings)
+    return labels, selector.select(labels, embeddings), clusterer.num_clusters
 
 
 def cluster_videos(embedding_folder, clustering_folder, method,
@@ -41,12 +41,14 @@ def cluster_videos(embedding_folder, clustering_folder, method,
             if os.path.exists(keyframes_path) and os.path.exists(scores_path):
                 continue
             
-            labels, selections = cluster_embeddings(embeddings, method,
-                                                    num_clusters,
-                                                    window_size,
-                                                    min_seg_length,
-                                                    distance)
+            labels, selections, n_clusters = cluster_embeddings(embeddings,
+                                                                method,
+                                                                num_clusters,
+                                                                window_size,
+                                                                min_seg_length,
+                                                                distance)
             
+            print(f'Number of clusters: {n_clusters}')
             keyframes = samples[selections[0]]
             
             np.save(keyframes_path, keyframes)

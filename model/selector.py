@@ -21,7 +21,12 @@ class Clusterer:
             raise ValueError('Invalid clustering method')
 
     def cluster(self, embeddings):
-        return self.model.fit_predict(embeddings)
+        labels = self.model.fit_predict(embeddings)
+        
+        if self.method == 'dbscan':
+            self.num_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+        
+        return labels
 
 
 class Selector:

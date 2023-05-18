@@ -1,7 +1,6 @@
 import cv2 as cv
 import numpy as np
 # Probability distribution distance
-from sklearn.metrics.pairwise import cosine_distances, euclidean_distances
 from scipy.spatial.distance import jensenshannon
 
 
@@ -30,9 +29,9 @@ def distance_metric(distance):
     if distance == 'jensenshannon':
         return jensenshannon
     elif distance == 'euclidean':
-        return euclidean_distances
+        return distance
     elif distance == 'cosine':
-        return cosine_distances
+        return distance
     else:
         raise ValueError(f'Unknown distance metric: {distance}')
 

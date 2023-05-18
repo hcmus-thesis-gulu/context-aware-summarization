@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
-from sklearn.mixture import GaussianMixture
+from sklearn.mixture import BayesianGaussianMixture
 from model.utils import mean_embeddings, similarity_score, distance_metric
 
 
@@ -16,7 +16,7 @@ class Clusterer:
             metric = distance_metric(distance)
             self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
         elif self.method == 'gaussian':
-            self.model = GaussianMixture(n_components=self.num_clusters)
+            self.model = BayesianGaussianMixture(n_components=self.num_clusters)
         else:
             raise ValueError('Invalid clustering method')
 

@@ -3,9 +3,9 @@ import argparse
 import numpy as np
 import cv2 as cv
 from tqdm import tqdm
-from model.reducer import Reducer
 import matplotlib.pyplot as plt
 import matplotlib.offsetbox as offsetbox
+from model.reducer import Reducer
 
 
 def broadcast_video(raw_video_path, frame_indexes, output_path, fps=None):

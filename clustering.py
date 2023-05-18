@@ -1,8 +1,8 @@
 import os
+import time
 import argparse
 import numpy as np
 from model.selector import Clusterer, Selector
-import time
 
 
 def read_npy(features_path):

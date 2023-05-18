@@ -1,13 +1,13 @@
 import argparse
 import os
+import time
 import numpy as np
+import cv2 as cv
+from tqdm import tqdm
+from PIL import Image
 from torchvision.transforms import ToTensor
 from model.embedder import DINOEmbedder
 from model.utils import count_frames
-import cv2 as cv
-from tqdm import tqdm
-import time
-from PIL import Image
 
 
 def extract_embedding_from_video(video_path, filename, output_folder,

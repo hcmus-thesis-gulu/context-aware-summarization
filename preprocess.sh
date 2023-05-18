@@ -23,6 +23,6 @@ python clustering.py \
 --method agglo \
 --num-clusters 6 \
 --distance cosine \
---embedding-dim 8 \
+--embedding-dim 3 \
 --window-size 5 \
 --min-seg-length 3

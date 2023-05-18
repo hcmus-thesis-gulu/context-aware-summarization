@@ -79,7 +79,7 @@ def main():
     parser.add_argument('--distance', type=str, default='euclidean',
                         choices=['jensenshannon', 'euclidean', 'cosine'],
                         help='distance metric for clustering')
-    parser.add_argument('--embedding-dim', type=int, default=8,
+    parser.add_argument('--embedding-dim', type=int, default=3,
                         help='dimension of embeddings')
     
     parser.add_argument('--window-size', type=int, default=10,

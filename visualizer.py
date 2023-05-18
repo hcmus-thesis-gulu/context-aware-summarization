@@ -103,12 +103,11 @@ def visualize_cluster(video_folder, embedding_folder,
             if frame_idx in sample_idxs:
                 props = dict(edgecolor='red', linewidth=1)
                 if frame_idx not in keyframe_idxs:
-                    frame = cv.cvtColor(frame,
-                                        cv.COLOR_BGR2GRAY
-                                        )
+                    frame = cv.cvtColor(frame)
                     props = None
                 
                 imagebox = offsetbox.AnnotationBbox(offsetbox.OffsetImage(frame, zoom=0.02),
+                                                    pad=0, borderpad=0,
                                                     reduced_embeddings[embedding_idx],
                                                     bboxprops=props)
                 

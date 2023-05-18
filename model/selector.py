@@ -1,13 +1,16 @@
 import numpy as np
+from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import BayesianGaussianMixture
 from model.utils import mean_embeddings, similarity_score, distance_metric
 
 
 class Clusterer:
-    def __init__(self, method, distance, num_clusters=10):
+    def __init__(self, method, distance, num_clusters=10, embedding_dim=64):
         self.method = method
         self.num_clusters = num_clusters
+        
+        self.reducer = PCA(n_components=embedding_dim)
         
         if self.method == 'kmeans':
             print(f"Using K-Means")
@@ -30,7 +33,8 @@ class Clusterer:
             raise ValueError('Invalid clustering method')
 
     def cluster(self, embeddings):
-        labels = self.model.fit_predict(embeddings)
+        reduced_embeddings = self.reducer.fit_transform(embeddings)
+        labels = self.model.fit_predict(reduced_embeddings)
         
         if self.method == 'dbscan':
             self.num_clusters = len(set(labels)) - (1 if -1 in labels else 0)

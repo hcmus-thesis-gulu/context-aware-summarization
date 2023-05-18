@@ -10,8 +10,9 @@ def read_npy(features_path):
 
 
 def cluster_embeddings(features, method, n_clusters,
-                       window_size, min_seg_length):
-    clusterer = Clusterer(method, n_clusters)
+                       window_size, min_seg_length,
+                       distance):
+    clusterer = Clusterer(method, n_clusters, distance)
     selector = Selector(window_size, min_seg_length)
     labels = clusterer.cluster(features)
     
@@ -19,7 +20,7 @@ def cluster_embeddings(features, method, n_clusters,
 
 
 def cluster_videos(embedding_folder, clustering_folder, method,
-                   num_clusters, window_size, min_seg_length):
+                   num_clusters, window_size, min_seg_length, distance):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
             filename = os.path.splitext(embedding_name)[0]
@@ -43,7 +44,8 @@ def cluster_videos(embedding_folder, clustering_folder, method,
             labels, selections = cluster_embeddings(embeddings, method,
                                                     num_clusters,
                                                     window_size,
-                                                    min_seg_length)
+                                                    min_seg_length,
+                                                    distance)
             
             keyframes = samples[selections[0]]
             
@@ -68,6 +70,9 @@ def main():
                         help='window size for smoothing')
     parser.add_argument('--min-seg-length', type=int, default=10,
                         help='minimum segment length')
+    parser.add_argument('--distance', type=str, default='euclidean',
+                        choices=['chi2', 'jensenshannon', 'euclidean', 'cosine'],
+                        help='distance metric for clustering')
     
     args = parser.parse_args()
 
@@ -76,8 +81,9 @@ def main():
                    method=args.method,
                    num_clusters=args.num_clusters,
                    window_size=args.window_size,
-                   min_seg_length=args.min_seg_length
-                   )  
+                   min_seg_length=args.min_seg_length,
+                   distance=args.distance
+                   )
 
 
 if __name__ == '__main__':

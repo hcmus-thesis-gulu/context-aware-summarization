@@ -1,22 +1,25 @@
 import numpy as np
 from sklearn.cluster import KMeans, DBSCAN
 from sklearn.mixture import GaussianMixture
-from model.utils import mean_embeddings, similarity_score
+from model.utils import mean_embeddings, similarity_score, distance_metric
+
 
 class Clusterer:
-    def __init__(self, method, num_clusters=10):
+    def __init__(self, method, distance, num_clusters=10):
         self.method = method
         self.num_clusters = num_clusters
         
         if self.method == 'kmeans':
             self.model = KMeans(n_clusters=self.num_clusters, n_init='auto')
         elif self.method == 'dbscan':
-            self.model = DBSCAN(eps=0.5, min_samples=10)
+            print(f"Using {distance} distance metric for DBSCAN")
+            metric = distance_metric(distance)
+            self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
         elif self.method == 'gaussian':
             self.model = GaussianMixture(n_components=self.num_clusters)
         else:
             raise ValueError('Invalid clustering method')
-        
+
     def cluster(self, embeddings):
         return self.model.fit_predict(embeddings)
 

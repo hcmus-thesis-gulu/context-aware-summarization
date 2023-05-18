@@ -1,5 +1,8 @@
 import cv2 as cv
 import numpy as np
+# Probability distribution distance
+from sklearn.metrics.pairwise import chi2_kernel, cosine_distances, euclidean_distances
+from scipy.spatial.distance import jensenshannon
 
 
 def count_frames(video_path):
@@ -21,6 +24,19 @@ def count_frames(video_path):
 
 def mean_embeddings(embeddings):
     return np.mean(embeddings, axis=0)
+
+
+def distance_metric(distance):
+    if distance == 'chi2':
+        return chi2_kernel
+    elif distance == 'jensenshannon':
+        return jensenshannon
+    elif distance == 'euclidean':
+        return euclidean_distances
+    elif distance == 'cosine':
+        return cosine_distances
+    else:
+        raise ValueError(f'Unknown distance metric: {distance}')
 
 
 # Compute the cosine similarity between set of features and its mean

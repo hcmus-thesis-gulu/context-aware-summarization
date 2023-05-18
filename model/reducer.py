@@ -1,5 +1,5 @@
-from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 
 class Reducer:
@@ -8,13 +8,18 @@ class Reducer:
         self.intermediate_components = intermediate_components
         self.perplexity = perplexity
         self.num_components = num_components
+        self.intermediate = intermediate_components is not None
         
-        self.pre_reducer = PCA(n_components=self.intermediate_components)
+        if self.intermediate:
+            self.pre_reducer = PCA(n_components=self.intermediate_components)
+        
         self.reducer = TSNE(n_components=self.num_components,
                             perplexity=self.perplexity,
                             metric='cosine'
                             )
 
     def reduce(self, embeddings):
-        reduced_embeddings = self.pre_reducer.fit_transform(embeddings)
-        return self.reducer.fit_transform(reduced_embeddings)
+        if self.intermediate:
+            embeddings = self.pre_reducer.fit_transform(embeddings)
+        
+        return embeddings, self.reducer.fit_transform(embeddings)

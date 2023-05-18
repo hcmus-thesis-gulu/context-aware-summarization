@@ -62,6 +62,8 @@ def visualize_cluster(video_folder, embedding_folder,
     embedding_file = os.path.join(embedding_folder, f'{video_name}.npy')
     keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
     label_file = os.path.join(clustering_folder, f'{video_name}_labels.npy')
+    reduced_file = os.path.join(clustering_folder, f'{video_name}_reduced.npy')
+    
     video_file = os.path.join(video_folder, f'{video_name}.mp4')
     
     # try:
@@ -69,10 +71,11 @@ def visualize_cluster(video_folder, embedding_folder,
     keyframe_idxs = np.load(keyframe_file)
     labels = np.load(label_file)
     embeddings = np.load(embedding_file)
+    reduced_embeddings = np.load(reduced_file)
     
     # Fit and transform the data
-    reducer = Reducer(intermediate_components=num_components)
-    reduced_embeddings = reducer.reduce(embeddings)
+    reducer = Reducer(intermediate_components=None)
+    _, reduced_embeddings = reducer.reduce(embeddings)
     
     # Plot the transformed data
     fig, ax = plt.subplots()

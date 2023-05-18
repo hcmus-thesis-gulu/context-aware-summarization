@@ -22,6 +22,7 @@ python clustering.py \
 --clustering-folder "$2/clustering" \
 --method agglo \
 --num-clusters 6 \
+--distance cosine \
+--embedding-dim 8 \
 --window-size 5 \
---min-seg-length 3 \
---distance cosine
+--min-seg-length 3

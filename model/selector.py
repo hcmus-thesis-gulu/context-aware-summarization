@@ -1,18 +1,18 @@
 import numpy as np
 from sklearn.decomposition import PCA
-from sklearn.embedding import TSNE
+from sklearn.manifold import TSNE
 from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import BayesianGaussianMixture
+from model.reducer import Reducer
 from model.utils import mean_embeddings, similarity_score, distance_metric
 
 
 class Clusterer:
-    def __init__(self, method, distance, num_clusters=10, embedding_dim=64):
+    def __init__(self, method, distance, num_clusters, embedding_dim):
         self.method = method
         self.num_clusters = num_clusters
         
-        self.pre_reducer = PCA(n_components=embedding_dim)
-        self.reducer = TSNE(n_components=2, perplexity=30, metric='cosine')
+        self.reducer = Reducer(num_components=embedding_dim)
         
         if self.method == 'kmeans':
             print(f"Using K-Means")
@@ -35,14 +35,13 @@ class Clusterer:
             raise ValueError('Invalid clustering method')
 
     def cluster(self, embeddings):
-        pre_reduced_embeddings = self.pre_reducer.fit_transform(embeddings)
-        reduced_embeddings = self.reducer.fit_transform(pre_reduced_embeddings)
+        pre_embeddings, reduced_embeddings = self.reducer.reduce(embeddings)
         labels = self.model.fit_predict(reduced_embeddings)
         
         if self.method == 'dbscan':
             self.num_clusters = len(set(labels)) - (1 if -1 in labels else 0)
         
-        return labels
+        return labels, pre_embeddings
 
 
 class Selector:

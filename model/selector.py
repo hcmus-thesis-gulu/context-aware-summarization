@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.cluster import KMeans, DBSCAN
+from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
 from sklearn.mixture import BayesianGaussianMixture
 from model.utils import mean_embeddings, similarity_score, distance_metric
 
@@ -15,6 +15,8 @@ class Clusterer:
             print(f"Using {distance} distance metric for DBSCAN")
             metric = distance_metric(distance)
             self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
+        elif self.method == 'agglo':
+            self.model = AgglomerativeClustering(n_clusters=self.num_clusters)
         elif self.method == 'gaussian':
             self.model = BayesianGaussianMixture(n_components=self.num_clusters)
         else:

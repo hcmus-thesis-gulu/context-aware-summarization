@@ -64,7 +64,7 @@ def main():
     parser.add_argument('--clustering-folder', type=str, required=True,
                         help='path to output folder for clustering')
     parser.add_argument('--method', type=str, default='kmeans',
-                        choices=['kmeans', 'dbscan', 'gaussian'],
+                        choices=['kmeans', 'dbscan', 'gaussian', 'agglo'],
                         help='clustering method')
     parser.add_argument('--num-clusters', type=int, default=10,
                         help='number of clusters')

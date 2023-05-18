@@ -9,14 +9,14 @@ def read_npy(features_path):
     return np.load(features_path)
 
 
-def cluster_embeddings(features, method, n_clusters,
+def cluster_embeddings(embeddings, method, n_clusters,
                        window_size, min_seg_length,
                        distance):
     clusterer = Clusterer(method, distance, n_clusters)
     selector = Selector(window_size, min_seg_length)
-    labels = clusterer.cluster(features)
+    labels = clusterer.cluster(embeddings)
     
-    return labels, selector.select(labels, features)
+    return labels, selector.select(labels, embeddings)
 
 
 def cluster_videos(embedding_folder, clustering_folder, method,

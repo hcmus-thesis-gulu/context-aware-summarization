@@ -56,7 +56,8 @@ def visualize_video(video_folder, embedding_folder, clustering_folder, demo_fold
 
 def visualize_cluster(video_folder, embedding_folder,
                       clustering_folder, video_name,
-                      num_components, show_image=False):
+                      num_components, color_value,
+                      show_image=False):
     sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     embedding_file = os.path.join(embedding_folder, f'{video_name}.npy')
     keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
@@ -76,12 +77,14 @@ def visualize_cluster(video_folder, embedding_folder,
     # Plot the transformed data
     fig, ax = plt.subplots()
     ax.margins(tight=True)
+    
+    color, label = (sample_idxs, "Sample indexes") if color_value == 'index' else (labels, "Cluster labels")
     sc = ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
-                    c=sample_idxs, cmap='rainbow', alpha=0.6)
+                    c=color, cmap='rainbow', alpha=0.6)
     ax.set_ylabel('1st t-SNE dim')
     ax.set_xlabel('2nd t-SNE dim')
     cbar = fig.colorbar(sc)
-    cbar.set_label("Sample idxs")
+    cbar.set_label(label)
     
     if show_image:
         video = cv.VideoCapture(video_file)
@@ -138,6 +141,9 @@ def main():
                         help='number of intermediate components')
     parser.add_argument('--show-image', action='store_true',
                         help='show image in cluster')
+    parser.add_argument('--color-value', type=str, default='index',
+                        choices=['index', 'label'],
+                        help='color value')
 
     args = parser.parse_args()
     
@@ -147,7 +153,9 @@ def main():
                           clustering_folder=args.clustering_folder,
                           video_name=args.video_name,
                           num_components=args.intermediate_components,
-                          show_image=args.show_image)
+                          show_image=args.show_image,
+                          color_value=args.color_value
+                          )
     else:
         visualize_video(video_folder=args.video_folder,
                         embedding_folder=args.embedding_folder,

@@ -18,4 +18,5 @@ python visualizer.py \
 --video-name "$3" \
 --visual-type cluster \
 --output-fps 4 \
---intermediate-components 50
+--intermediate-components 50 \
+--color-value label

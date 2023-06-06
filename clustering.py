@@ -8,6 +8,10 @@ from model.selector import Clusterer, Selector
 def read_npy(features_path):
     return np.load(features_path)
 
+def calculate_num_clusters(num_frames, max_len, frame_rate=4):    
+    max_clusters = max_len*frame_rate
+    num_clusters = max_clusters*2/(1 + np.exp((-10**-3) * num_frames)) - max_clusters
+    return int(num_clusters)
 
 def cluster_embeddings(embeddings, method, n_clusters,
                        window_size, min_seg_length,
@@ -20,14 +24,19 @@ def cluster_embeddings(embeddings, method, n_clusters,
             clusterer.num_clusters, reduced_embeddings)
 
 
+
+
 def cluster_videos(embedding_folder, clustering_folder, method,
-                   num_clusters, window_size, min_seg_length, distance,
+                   max_len, window_size, min_seg_length, distance,
                    embedding_dim):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
             filename = os.path.splitext(embedding_name)[0]
             embedding_file = os.path.join(embedding_folder, embedding_name)
             embeddings = read_npy(embedding_file)
+            print(embeddings.shape[0])
+            break
+            num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
             
             sample_file = os.path.join(embedding_folder, f'{filename}_samples.npy')
             samples = read_npy(sample_file)
@@ -74,8 +83,8 @@ def main():
     parser.add_argument('--method', type=str, default='kmeans',
                         choices=['kmeans', 'dbscan', 'gaussian', 'agglo'],
                         help='clustering method')
-    parser.add_argument('--num-clusters', type=int, default=10,
-                        help='number of clusters')
+    parser.add_argument('--max-len', type=int, default=10,
+                        help='max length')
     parser.add_argument('--distance', type=str, default='euclidean',
                         choices=['jensenshannon', 'euclidean', 'cosine'],
                         help='distance metric for clustering')
@@ -93,7 +102,8 @@ def main():
     cluster_videos(embedding_folder=args.embedding_folder,
                    clustering_folder=args.clustering_folder,
                    method=args.method,
-                   num_clusters=args.num_clusters,
+                   max_len=args.max_len,
+                #    num_clusters=args.num_clusters,
                    window_size=args.window_size,
                    min_seg_length=args.min_seg_length,
                    distance=args.distance,

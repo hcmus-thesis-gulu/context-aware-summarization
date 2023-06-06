@@ -1,15 +1,13 @@
 import numpy as np
-from model.utils import mean_embeddings, similarity_score
 
 
 class Selector:
-    def __init__(self, representative="mean", window_size=5, min_seg_length=10):
-        self.representative = representative
+    def __init__(self, window_size=5, min_seg_length=10):
         self.window_size = window_size
         self.min_seg_length = min_seg_length
 
     # Segment the video into shots based on the smoothed labels
-    def segment_frames(self, labels):
+    def select(self, labels):
         segments = []   # List of (label, start, end) tuples
         start = 0
         current_label = None
@@ -76,30 +74,4 @@ class Selector:
                 current_label = label
                 post_segments.append((current_label, start, end))
         
-        return segments
-
-    # For each segment, compute the mean features and
-    # similarity of all features with the mean
-    def segment_score(self, embeddings, segments):
-        segment_scores = []
-        
-        for _, start, end in segments:
-            # Get the associated features
-            segment_features = embeddings[start:end]
-            
-            # Calculate the similarity with representative
-            if self.representative == "mean":
-                mean = mean_embeddings(segment_features)
-            elif self.representative == "middle":
-                mean = segment_features[len(segment_features) // 2]
-            
-            score = similarity_score(segment_features, mean)
-            segment_scores.extend(score.tolist())
-        
-        return np.asarray(segment_scores)
-
-    def select(self, labels, embeddings):
-        segments = self.segment_frames(labels)
-        scores = self.segment_score(embeddings, segments)
-        
-        return scores
+        return np.asarray(post_segments)

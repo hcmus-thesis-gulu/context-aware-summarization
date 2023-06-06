@@ -8,19 +8,18 @@ from model.selector import Selector
 from model.utils import calculate_num_clusters
 
 
-def localize_context(embeddings, method, n_clusters,
-                     representative, window_size,
+def localize_context(embeddings, method, n_clusters, window_size,
                      min_seg_length, distance, embedding_dim):
     clusterer = Clusterer(method, distance, n_clusters, embedding_dim)
-    selector = Selector(representative, window_size, min_seg_length)
+    selector = Selector(window_size, min_seg_length)
     labels, reduced_embeddings = clusterer.cluster(embeddings)
     
-    return (labels, selector.select(labels, reduced_embeddings),
+    return (labels, selector.select(labels),
             clusterer.num_clusters, reduced_embeddings)
 
 
 def localize_videos(embedding_folder, clustering_folder, method,
-                    max_len, representative, window_size, min_seg_length,
+                    max_len, window_size, min_seg_length,
                     distance, embedding_dim):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
@@ -47,19 +46,18 @@ def localize_videos(embedding_folder, clustering_folder, method,
             
             num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
             print(f"Initial number of clusters: {num_clusters}")
-            labels, selections, n_clusters, reduced_embs = localize_context(embeddings,
-                                                                            method,
-                                                                            num_clusters,
-                                                                            representative,
-                                                                            window_size,
-                                                                            min_seg_length,
-                                                                            distance,
-                                                                            embedding_dim
-                                                                            )
+            labels, parts, n_clusters, reduced_embs = localize_context(embeddings,
+                                                                       method,
+                                                                       num_clusters,
+                                                                       window_size,
+                                                                       min_seg_length,
+                                                                       distance,
+                                                                       embedding_dim
+                                                                       )
             
             print(f'Number of clusters: {n_clusters}')
             
-            np.save(scores_path, selections)
+            np.save(scores_path, parts)
             np.save(labels_path, labels)
             np.save(reduced_path, reduced_embs)
 
@@ -78,6 +76,8 @@ def main():
                         help='clustering method')
     parser.add_argument('--num-clusters', type=int, default=0,
                         help='Number of clusters with 0 being automatic detection')
+    parser.add_argument('--max-len', type=int, default=60,
+                        help='Maximum length of output summarization in seconds')
     parser.add_argument('--distance', type=str, default='euclidean',
                         choices=['jensenshannon', 'euclidean', 'cosine'],
                         help='distance metric for clustering')
@@ -88,16 +88,14 @@ def main():
                         help='window size for smoothing')
     parser.add_argument('--min-seg-length', type=int, default=10,
                         help='minimum segment length')
-    parser.add_argument('--representative', type=str, default='mean',
-                        choices=['mean', 'middle'],
-                        help='Method of representing segments')
     
     args = parser.parse_args()
 
     localize_videos(embedding_folder=args.embedding_folder,
                     clustering_folder=args.clustering_folder,
                     method=args.method,
-                    num_clusters=args.num_clusters,
+                    # num_clusters=args.num_clusters,
+                    max_len=args.max_len,
                     window_size=args.window_size,
                     min_seg_length=args.min_seg_length,
                     distance=args.distance,

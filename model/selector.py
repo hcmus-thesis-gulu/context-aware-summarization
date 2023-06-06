@@ -3,7 +3,8 @@ from model.utils import mean_embeddings, similarity_score
 
 
 class Selector:
-    def __init__(self, window_size=5, min_seg_length=10):
+    def __init__(self, representative="mean", window_size=5, min_seg_length=10):
+        self.representative = representative
         self.window_size = window_size
         self.min_seg_length = min_seg_length
 
@@ -86,8 +87,12 @@ class Selector:
             # Get the associated features
             segment_features = embeddings[start:end]
             
-            # Calculate the similarity with mean
-            mean = mean_embeddings(segment_features)
+            # Calculate the similarity with representative
+            if self.representative == "mean":
+                mean = mean_embeddings(segment_features)
+            elif self.representative == "middle":
+                mean = segment_features[len(segment_features) // 2]
+            
             score = similarity_score(segment_features, mean)
             segment_scores.extend(score.tolist())
         

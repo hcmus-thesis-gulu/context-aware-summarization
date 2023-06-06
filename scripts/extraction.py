@@ -9,10 +9,10 @@ from model.utils import calculate_num_clusters
 
 
 def localize_context(embeddings, method, n_clusters,
-                     window_size, min_seg_length,
-                     distance, embedding_dim):
+                     representative, window_size,
+                     min_seg_length, distance, embedding_dim):
     clusterer = Clusterer(method, distance, n_clusters, embedding_dim)
-    selector = Selector(window_size, min_seg_length)
+    selector = Selector(representative, window_size, min_seg_length)
     labels, reduced_embeddings = clusterer.cluster(embeddings)
     
     return (labels, selector.select(labels, reduced_embeddings),
@@ -20,8 +20,8 @@ def localize_context(embeddings, method, n_clusters,
 
 
 def localize_videos(embedding_folder, clustering_folder, method,
-                    max_len, window_size, min_seg_length, distance,
-                    embedding_dim):
+                    max_len, representative, window_size, min_seg_length,
+                    distance, embedding_dim):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
             print(f"Processing the context of video {embedding_name}")
@@ -50,6 +50,7 @@ def localize_videos(embedding_folder, clustering_folder, method,
             labels, selections, n_clusters, reduced_embs = localize_context(embeddings,
                                                                             method,
                                                                             num_clusters,
+                                                                            representative,
                                                                             window_size,
                                                                             min_seg_length,
                                                                             distance,
@@ -87,6 +88,9 @@ def main():
                         help='window size for smoothing')
     parser.add_argument('--min-seg-length', type=int, default=10,
                         help='minimum segment length')
+    parser.add_argument('--representative', type=str, default='mean',
+                        choices=['mean', 'middle'],
+                        help='Method of representing segments')
     
     args = parser.parse_args()
 

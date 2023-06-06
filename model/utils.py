@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+from scipy import sparse
 # Probability distribution distance
 from scipy.spatial.distance import jensenshannon
 
@@ -44,3 +45,30 @@ def similarity_score(embeddings, mean=None):
     return np.dot(embeddings, mean) / (np.linalg.norm(embeddings) *
                                        np.linalg.norm(mean)
                                        )
+
+
+def construct_connectivity(data, labels):
+    # create the connectivity matrix for the agglomerative clustering model
+    row = []
+    col = []
+    subcluster_dict = {}
+    embedding_shape = data.shape
+
+    for i in range(embedding_shape[0]):
+        if labels[i] not in subcluster_dict:
+            subcluster_dict[labels[i]] = []
+        subcluster_dict[labels[i]].append(i)
+    for subcluster in subcluster_dict.values():
+        for i, element in enumerate(subcluster):
+            for j in range(i+1, len(subcluster)):
+                row.append(element)
+                col.append(subcluster[j])
+                row.append(subcluster[j])
+                col.append(element)
+    
+    connectivity = sparse.csr_matrix((np.ones(len(row)), (row, col)),
+                                     shape=(embedding_shape[0],
+                                            embedding_shape[0])
+                                     )
+    
+    return connectivity

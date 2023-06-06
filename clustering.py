@@ -2,7 +2,9 @@ import os
 import time
 import argparse
 import numpy as np
-from model.selector import Clusterer, Selector
+
+from model.propogator import Clusterer
+from model.selector import Selector
 
 
 def read_npy(features_path):
@@ -16,7 +18,7 @@ def cluster_embeddings(embeddings, method, n_clusters,
     selector = Selector(window_size, min_seg_length)
     labels, reduced_embeddings = clusterer.cluster(embeddings)
     
-    return (labels, selector.select(labels, embeddings),
+    return (labels, selector.select(labels, reduced_embeddings),
             clusterer.num_clusters, reduced_embeddings)
 
 

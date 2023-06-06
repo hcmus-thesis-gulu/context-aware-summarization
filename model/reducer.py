@@ -1,5 +1,6 @@
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
+from sklearn import preprocessing
 
 
 class Reducer:
@@ -23,3 +24,11 @@ class Reducer:
             embeddings = self.pre_reducer.fit_transform(embeddings)
         
         return embeddings, self.reducer.fit_transform(embeddings)
+
+
+class Scaler:
+    def __init__(self):
+        self.scaler = preprocessing.StandardScaler()
+        
+    def predict(self, embeddings):
+        return self.scaler.fit_transform(embeddings)

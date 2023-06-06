@@ -1,47 +1,5 @@
 import numpy as np
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
-from sklearn.cluster import KMeans, DBSCAN, AgglomerativeClustering
-from sklearn.mixture import BayesianGaussianMixture
-from model.reducer import Reducer
-from model.utils import mean_embeddings, similarity_score, distance_metric
-
-
-class Clusterer:
-    def __init__(self, method, distance, num_clusters, embedding_dim):
-        self.method = method
-        self.num_clusters = num_clusters
-        
-        self.reducer = Reducer(num_components=embedding_dim)
-        
-        if self.method == 'kmeans':
-            print(f"Using K-Means")
-            self.model = KMeans(n_clusters=self.num_clusters, n_init='auto')
-        elif self.method == 'dbscan':
-            print(f"Using {distance} distance metric for DBSCAN")
-            metric = distance_metric(distance)
-            self.model = DBSCAN(eps=0.5, min_samples=10, metric=metric)
-        elif self.method == 'agglo':
-            linkage = 'ward' if distance == 'euclidean' else 'average'
-            print(f"Using {distance} distance metric and {linkage} linkage for Agglomerative Clustering")
-            self.model = AgglomerativeClustering(n_clusters=self.num_clusters,
-                                                 metric=distance,
-                                                 linkage=linkage
-                                                 )
-        elif self.method == 'gaussian':
-            print(f"Using Bayesian inference for Gaussian Mixture Model")
-            self.model = BayesianGaussianMixture(n_components=self.num_clusters)
-        else:
-            raise ValueError('Invalid clustering method')
-
-    def cluster(self, embeddings):
-        pre_embeddings, reduced_embeddings = self.reducer.reduce(embeddings)
-        labels = self.model.fit_predict(reduced_embeddings)
-        
-        if self.method == 'dbscan':
-            self.num_clusters = len(set(labels)) - (1 if -1 in labels else 0)
-        
-        return labels, pre_embeddings
+from model.utils import mean_embeddings, similarity_score
 
 
 class Selector:

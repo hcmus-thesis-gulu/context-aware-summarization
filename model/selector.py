@@ -81,7 +81,6 @@ class Selector:
     # similarity of all features with the mean
     def segment_score(self, embeddings, segments):
         segment_scores = []
-        segment_keyframes = []
         
         for _, start, end in segments:
             # Get the associated features
@@ -91,15 +90,11 @@ class Selector:
             mean = mean_embeddings(segment_features)
             score = similarity_score(segment_features, mean)
             segment_scores.extend(score.tolist())
-            
-            # Frame with highest score is chosen as the keyframe
-            keyframe_idx = np.argmax(score)
-            segment_keyframes.append(start + keyframe_idx)
         
-        return np.asarray(segment_keyframes), np.asarray(segment_scores)
+        return np.asarray(segment_scores)
 
     def select(self, labels, embeddings):
         segments = self.segment_frames(labels)
-        keyframes, scores = self.segment_score(embeddings, segments)
+        scores = self.segment_score(embeddings, segments)
         
-        return keyframes, scores
+        return scores

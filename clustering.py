@@ -82,8 +82,9 @@ def main():
     parser.add_argument('--clustering-folder', type=str, required=True,
                         help='path to output folder for clustering')
     
-    parser.add_argument('--method', type=str, default='kmeans',
-                        choices=['kmeans', 'dbscan', 'gaussian', 'agglo'],
+    parser.add_argument('--method', type=str, default='ours',
+                        choices=['kmeans', 'dbscan', 'gaussian',
+                                 'agglo', 'ours'],
                         help='clustering method')
     parser.add_argument('--max-len', type=int, default=10,
                         help='max length')

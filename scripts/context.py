@@ -10,8 +10,8 @@ from model.embedder import DINOEmbedder
 from model.utils import count_frames
 
 
-def extract_embedding_from_video(video_path, filename, output_folder,
-                                 embedder, frame_rate=None):
+def generate_context(video_path, filename, output_folder,
+                     embedder, frame_rate=None):
     # Define transformations
     transform = ToTensor()
     
@@ -73,24 +73,20 @@ def extract_embedding_from_video(video_path, filename, output_folder,
     np.save(sample_file, samples)
     
 
-def extract_embedding_from_path(video_path, output_folder,
-                                frame_rate=None, representation='cls',
-                                model_name='b16', device='cuda'):
-    embedder = DINOEmbedder(representation,
-                            model_name,
-                            device
-                            )
+def videos_context(video_path, output_folder, frame_rate=None,
+                   representation='cls', model_name='b16', device='cuda'):
+    embedder = DINOEmbedder(representation, model_name, device)
     
     # Extract features for each video file
     for filename in os.listdir(video_path):
         if filename.endswith('.mp4'):
-            extract_embedding_from_video(video_path, filename, output_folder,
-                                         embedder, frame_rate)
+            generate_context(video_path, filename, output_folder,
+                             embedder, frame_rate)
 
 
 if __name__ == '__main__':
     start_time = time.time()
-    parser = argparse.ArgumentParser(description='Extract DINO features from videos')
+    parser = argparse.ArgumentParser(description='Generating Contextual Features of Videos using DINO Embeddings')
     parser.add_argument('--video-folder', type=str, required=True,
                         help='Path to folder containing videos')
     parser.add_argument('--embedding-folder', type=str, required=True,
@@ -111,7 +107,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    extract_embedding_from_path(args.video_folder, args.embedding_folder,
+    videos_context(args.video_folder, args.embedding_folder,
                                 args.frame_rate, args.representation,
                                 args.model_name, args.device
                                 )

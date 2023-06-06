@@ -65,29 +65,19 @@ def localize_videos(embedding_folder, clustering_folder, method,
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Convert Global Context of Videos into Local Semantics.')
+    parser = argparse.ArgumentParser(description='Generate Summaries from Partitioned Selections of Videos.')
     
     parser.add_argument('--embedding-folder', type=str, required=True,
                         help='path to folder containing feature files')
     parser.add_argument('--clustering-folder', type=str, required=True,
                         help='path to output folder for clustering')
+    parser.add_argument('--summary-folder', type=str, required=True,
+                        help='path to output folder for summaries')
     
-    parser.add_argument('--method', type=str, default='ours',
-                        choices=['kmeans', 'dbscan', 'gaussian',
-                                 'agglo', 'ours'],
-                        help='clustering method')
-    parser.add_argument('--num-clusters', type=int, default=0,
-                        help='Number of clusters with 0 being automatic detection')
-    parser.add_argument('--distance', type=str, default='euclidean',
-                        choices=['jensenshannon', 'euclidean', 'cosine'],
-                        help='distance metric for clustering')
-    parser.add_argument('--embedding-dim', type=int, default=3,
-                        help='dimension of embeddings')
+    parser.add_argument('--method', type=str, default='max',
+                        choices=['max'],
+                        help='Method of selecting keyframes')
     
-    parser.add_argument('--window-size', type=int, default=10,
-                        help='window size for smoothing')
-    parser.add_argument('--min-seg-length', type=int, default=10,
-                        help='minimum segment length')
     parser.add_argument('--representative', type=str, default='mean',
                         choices=['mean', 'middle'],
                         help='Method of representing segments')

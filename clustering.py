@@ -8,8 +8,8 @@ from model.selector import Clusterer, Selector
 def read_npy(features_path):
     return np.load(features_path)
 
-def calculate_num_clusters(num_frames, max_len, frame_rate=4):    
-    max_clusters = max_len*frame_rate
+def calculate_num_clusters(num_frames, min_len, frame_rate=4):    
+    max_clusters = min_len*frame_rate
     num_clusters = max_clusters*2/(1 + np.exp((-10**-3) * num_frames)) - max_clusters
     return int(num_clusters)
 
@@ -27,7 +27,7 @@ def cluster_embeddings(embeddings, method, n_clusters,
 
 
 def cluster_videos(embedding_folder, clustering_folder, method,
-                   max_len, window_size, min_seg_length, distance,
+                   min_len, window_size, min_seg_length, distance,
                    embedding_dim):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
@@ -36,7 +36,7 @@ def cluster_videos(embedding_folder, clustering_folder, method,
             embeddings = read_npy(embedding_file)
             print(embeddings.shape[0])
             break
-            num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
+            num_clusters = calculate_num_clusters(embeddings.shape[0], min_len)
             
             sample_file = os.path.join(embedding_folder, f'{filename}_samples.npy')
             samples = read_npy(sample_file)
@@ -102,7 +102,6 @@ def main():
     cluster_videos(embedding_folder=args.embedding_folder,
                    clustering_folder=args.clustering_folder,
                    method=args.method,
-                   max_len=args.max_len,
                 #    num_clusters=args.num_clusters,
                    window_size=args.window_size,
                    min_seg_length=args.min_seg_length,

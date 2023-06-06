@@ -72,3 +72,9 @@ def construct_connectivity(data, labels):
                                      )
     
     return connectivity
+
+
+def calculate_num_clusters(num_frames, max_len, frame_rate=4):    
+    max_clusters = max_len*frame_rate
+    num_clusters = max_clusters*2/(1 + np.exp((-10**-3) * num_frames)) - max_clusters
+    return int(num_clusters)

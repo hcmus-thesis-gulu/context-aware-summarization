@@ -18,30 +18,32 @@ def localize_context(embeddings, method, n_clusters, window_size,
             clusterer.num_clusters, reduced_embeddings)
 
 
-def localize_videos(embedding_folder, clustering_folder, method,
+def localize_videos(embedding_folder, context_folder, method,
                     max_len, window_size, min_seg_length,
                     distance, embedding_dim):
     for embedding_name in os.listdir(embedding_folder):
-        if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
-            print(f"Processing the context of video {embedding_name}")
+        if embedding_name.endswith('_embeddings.npy'):
+            filename = embedding_name[:-len('_embeddings.npy')]
+            print(f"Processing the context of video {filename}")
             
-            filename = os.path.splitext(embedding_name)[0]
             embedding_file = os.path.join(embedding_folder, embedding_name)
             embeddings = np.load(embedding_file)
             print(f"The extracted context has {embeddings.shape[0]} embeddings")
             
             # sample_file = os.path.join(embedding_folder, f'{filename}_samples.npy')
             # samples = np.load(sample_file)
-            scores_file = filename + '_scores.npy'
+            segment_file = filename + '_segments.npy'
             labels_file = filename + '_labels.npy'
             reduced_file = filename + '_reduced.npy'
             
-            scores_path = os.path.join(clustering_folder, scores_file)
-            labels_path = os.path.join(clustering_folder, labels_file)
-            reduced_path = os.path.join(clustering_folder, reduced_file)
+            segment_path = os.path.join(context_folder, segment_file)
+            labels_path = os.path.join(context_folder, labels_file)
+            
+            # Reduced embeddings
+            reduced_path = os.path.join(embedding_folder, reduced_file)
             
             print(f'Clustering frames of {filename}')
-            if os.path.exists(scores_path):
+            if os.path.exists(segment_path):
                 continue
             
             num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
@@ -57,7 +59,7 @@ def localize_videos(embedding_folder, clustering_folder, method,
             
             print(f'Number of clusters: {n_clusters}')
             
-            np.save(scores_path, parts)
+            np.save(segment_path, parts)
             np.save(labels_path, labels)
             np.save(reduced_path, reduced_embs)
 
@@ -67,7 +69,7 @@ def main():
     
     parser.add_argument('--embedding-folder', type=str, required=True,
                         help='path to folder containing feature files')
-    parser.add_argument('--clustering-folder', type=str, required=True,
+    parser.add_argument('--context-folder', type=str, required=True,
                         help='path to output folder for clustering')
     
     parser.add_argument('--method', type=str, default='ours',
@@ -92,7 +94,7 @@ def main():
     args = parser.parse_args()
 
     localize_videos(embedding_folder=args.embedding_folder,
-                    clustering_folder=args.clustering_folder,
+                    context_folder=args.context_folder,
                     method=args.method,
                     # num_clusters=args.num_clusters,
                     max_len=args.max_len,

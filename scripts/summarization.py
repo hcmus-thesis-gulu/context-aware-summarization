@@ -3,9 +3,7 @@ import time
 import argparse
 import numpy as np
 
-from model.propogator import Clusterer
-from model.selector import Selector
-from model.utils import calculate_num_clusters
+from model.generator import Summarizer
 
 
 def localize_context(embeddings, method, n_clusters,
@@ -19,49 +17,41 @@ def localize_context(embeddings, method, n_clusters,
             clusterer.num_clusters, reduced_embeddings)
 
 
-def localize_videos(embedding_folder, clustering_folder, method,
-                    max_len, representative, window_size, min_seg_length,
-                    distance, embedding_dim):
+def summarize_videos(embedding_folder, context_folder, summary_folder,
+                     reduced_emb, method, representative, key_length):
+    summarizer = Summarizer(representative, method)
+    
     for embedding_name in os.listdir(embedding_folder):
-        if embedding_name.endswith('.npy') and not embedding_name.endswith('samples.npy'):
-            print(f"Processing the context of video {embedding_name}")
+        file_end = '_reduced.npy' if reduced_emb else '_embeddings.npy'
+        
+        if embedding_name.endswith(file_end):
+            filename = embedding_name[:-len(file_end)]
+            print(f"Processing the context of video {filename}")
             
-            filename = os.path.splitext(embedding_name)[0]
             embedding_file = os.path.join(embedding_folder, embedding_name)
             embeddings = np.load(embedding_file)
             print(f"The extracted context has {embeddings.shape[0]} embeddings")
             
-            # sample_file = os.path.join(embedding_folder, f'{filename}_samples.npy')
-            # samples = np.load(sample_file)
+            segments_file = os.path.join(context_folder, filename + '_segments.npy')
+            segments = np.load(segments_file)
+            print(f"The extracted context has {segments.shape[0]} segments")
+            
             scores_file = filename + '_scores.npy'
-            labels_file = filename + '_labels.npy'
-            reduced_file = filename + '_reduced.npy'
+            keyframes_file = filename + '_keyframes.npy'
             
-            scores_path = os.path.join(clustering_folder, scores_file)
-            labels_path = os.path.join(clustering_folder, labels_file)
-            reduced_path = os.path.join(clustering_folder, reduced_file)
+            scores_path = os.path.join(summary_folder, scores_file)
+            keyframes_path = os.path.join(summary_folder, keyframes_file)
             
-            print(f'Clustering frames of {filename}')
+            print(f'Summarizing video {filename}')
             if os.path.exists(scores_path):
                 continue
             
-            num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
-            print(f"Initial number of clusters: {num_clusters}")
-            labels, selections, n_clusters, reduced_embs = localize_context(embeddings,
-                                                                            method,
-                                                                            num_clusters,
-                                                                            representative,
-                                                                            window_size,
-                                                                            min_seg_length,
-                                                                            distance,
-                                                                            embedding_dim
-                                                                            )
+            scores = summarizer.score_segments(embeddings, segments)
+            np.save(scores_path, scores)
             
-            print(f'Number of clusters: {n_clusters}')
-            
-            np.save(scores_path, selections)
-            np.save(labels_path, labels)
-            np.save(reduced_path, reduced_embs)
+            if key_length > 0:
+                key_indices = summarizer.select_keyframes(scores)
+                np.save(keyframes_path, key_indices)
 
 
 def main():
@@ -69,7 +59,7 @@ def main():
     
     parser.add_argument('--embedding-folder', type=str, required=True,
                         help='path to folder containing feature files')
-    parser.add_argument('--clustering-folder', type=str, required=True,
+    parser.add_argument('--context-folder', type=str, required=True,
                         help='path to output folder for clustering')
     parser.add_argument('--summary-folder', type=str, required=True,
                         help='path to output folder for summaries')
@@ -77,21 +67,25 @@ def main():
     parser.add_argument('--method', type=str, default='max',
                         choices=['max'],
                         help='Method of selecting keyframes')
-    
     parser.add_argument('--representative', type=str, default='mean',
                         choices=['mean', 'middle'],
                         help='Method of representing segments')
+    parser.add_argument('--reduced-emb', action='store_true',
+                        help='Use reduced embeddings or not')
+    
+    # How many keyframes to select
+    parser.add_argument('--max-len', type=int, default=0,
+                        "Maximum number of keyframes to select, 0 to not select")
     
     args = parser.parse_args()
 
-    localize_videos(embedding_folder=args.embedding_folder,
-                    clustering_folder=args.clustering_folder,
+    summarize_videos(embedding_folder=args.embedding_folder,
+                    context_folder=args.context_folder,
+                    summary_folder=args.summary_folder,
+                    reduced_emb=args.reduced_emb,
                     method=args.method,
-                    num_clusters=args.num_clusters,
-                    window_size=args.window_size,
-                    min_seg_length=args.min_seg_length,
-                    distance=args.distance,
-                    embedding_dim=args.embedding_dim
+                    representative=args.representative,
+                    key_length=args.max_len
                     )
 
 

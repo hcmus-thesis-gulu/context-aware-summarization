@@ -10,7 +10,7 @@ from model.embedder import DINOEmbedder
 from model.utils import count_frames
 
 
-def generate_context(video_path, filename, output_folder,
+def generate_context(video_folder, filename, embedding_folder,
                      embedder, frame_rate=None):
     # Define transformations
     transform = ToTensor()
@@ -18,9 +18,9 @@ def generate_context(video_path, filename, output_folder,
     # Get file path
     print(f'Extracting features for {filename}')
     video_name = os.path.splitext(filename)[0]
-    video_file = os.path.join(video_path, filename)
-    embedding_file = os.path.join(output_folder, f'{video_name}.npy')
-    sample_file = os.path.join(output_folder, f'{video_name}_samples.npy')
+    video_file = os.path.join(video_folder, filename)
+    embedding_file = os.path.join(embedding_folder, f'{video_name}_embeddings.npy')
+    sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     if os.path.exists(embedding_file) and os.path.exists(sample_file):
         return
     
@@ -73,14 +73,14 @@ def generate_context(video_path, filename, output_folder,
     np.save(sample_file, samples)
     
 
-def videos_context(video_path, output_folder, frame_rate=None,
+def videos_context(video_folder, embedding_folder, frame_rate=None,
                    representation='cls', model_name='b16', device='cuda'):
     embedder = DINOEmbedder(representation, model_name, device)
     
     # Extract features for each video file
-    for filename in os.listdir(video_path):
+    for filename in os.listdir(video_folder):
         if filename.endswith('.mp4'):
-            generate_context(video_path, filename, output_folder,
+            generate_context(video_folder, filename, embedding_folder,
                              embedder, frame_rate)
 
 

@@ -6,22 +6,22 @@ if [ $# -ne 2 ]; then
     exit 1
 fi
 
-# Create features and clustering folders inside output folder
-mkdir -p "$2/embeddings" "$2/clustering"
+# Create embeddings and contexts folders inside output folder
+mkdir -p "$2/embeddings" "$2/contexts"
 
-# Run feature extraction script with arguments
-python extractor.py \
+# Run context extraction script with arguments
+python scripts/context.py \
 --video-folder "$1" \
 --embedding-folder "$2/embeddings" \
 --frame-rate 4 \
 --representation cls
 
-# Run clustering script with arguments
-python clustering.py \
+# Run semantic extraction script with arguments
+python scripts/extraction.py \
 --embedding-folder "$2/embeddings" \
---clustering-folder "$2/clustering" \
---method agglo \
---num-clusters 6 \
+--clustering-folder "$2/contexts" \
+--method ours \
+# --num-clusters 6 \
 --distance cosine \
 --embedding-dim 3 \
 --window-size 5 \

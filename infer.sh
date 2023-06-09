@@ -2,21 +2,20 @@
 
 # Check if video folder path and output folder path are provided
 if [ $# -ne 3 ]; then
-    echo "Usage: $0 video_folder_path output_folder_path video_name"
+    echo "Usage: $0 video_folder_path output_folder_path"
     exit 1
 fi
 
-# Create features and clustering folders inside output folder
-mkdir -p "$2/demo"
+# Create summary folders inside output folder
+mkdir -p "$2/summaries"
 
-# Run feature extraction script with arguments
-python visualizer.py \
+# Run summarization script with arguments
+python scripts/summarization.py \
 --video-folder $1 \
 --embedding-folder "$2/embeddings" \
---clustering-folder "$2/clustering" \
---demo-folder "$2/demo" \
---video-name "$3" \
---visual-type cluster \
---output-fps 4 \
---intermediate-components 50 \
---color-value label
+--context-folder "$2/contexts" \
+--summary-folder "$2/summaries" \
+--method "max" \
+--representative "mean" \
+--reduced-emb 0 \
+--max-len 0

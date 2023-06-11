@@ -51,6 +51,7 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             
             if key_length > 0:
                 key_indices = summarizer.select_keyframes(scores)
+                print(f'Selected {len(key_indices)} keyframes')
                 np.save(keyframes_path, key_indices)
 
 

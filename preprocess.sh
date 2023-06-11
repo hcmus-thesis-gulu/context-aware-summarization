@@ -25,4 +25,5 @@ python scripts/extraction.py \
 --distance cosine \
 --embedding-dim 3 \
 --window-size 5 \
---min-seg-length 3
+--min-seg-length 3 \
+--modulation 1e-4

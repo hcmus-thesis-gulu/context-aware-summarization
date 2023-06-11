@@ -20,7 +20,7 @@ def localize_context(embeddings, method, n_clusters, window_size,
 
 def localize_videos(embedding_folder, context_folder, method,
                     max_len, window_size, min_seg_length,
-                    distance, embedding_dim):
+                    distance, embedding_dim, modulation):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('_embeddings.npy'):
             filename = embedding_name[:-len('_embeddings.npy')]
@@ -46,7 +46,10 @@ def localize_videos(embedding_folder, context_folder, method,
             if os.path.exists(segment_path):
                 continue
             
-            num_clusters = calculate_num_clusters(embeddings.shape[0], max_len)
+            num_clusters = calculate_num_clusters(embeddings.shape[0],
+                                                  max_len,
+                                                  modulation
+                                                  )
             print(f"Initial number of clusters: {num_clusters}")
             labels, parts, n_clusters, reduced_embs = localize_context(embeddings,
                                                                        method,
@@ -91,6 +94,8 @@ def main():
                         help='window size for smoothing')
     parser.add_argument('--min-seg-length', type=int, default=10,
                         help='minimum segment length')
+    parser.add_argument('--modulation', type=float, default=1e-3,
+                        help='modulation factor for number of clusters')
     
     args = parser.parse_args()
 
@@ -102,7 +107,8 @@ def main():
                     window_size=args.window_size,
                     min_seg_length=args.min_seg_length,
                     distance=args.distance,
-                    embedding_dim=args.embedding_dim
+                    embedding_dim=args.embedding_dim,
+                    modulation=args.modulation
                     )
 
 

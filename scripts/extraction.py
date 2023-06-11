@@ -58,6 +58,7 @@ def localize_videos(embedding_folder, context_folder, method,
                                                                        )
             
             print(f'Number of clusters: {n_clusters}')
+            print(f'Number of segments: {len(parts)}')
             
             np.save(segment_path, parts)
             np.save(labels_path, labels)

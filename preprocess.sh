@@ -19,9 +19,9 @@ python scripts/context.py \
 # Run semantic extraction script with arguments
 python scripts/extraction.py \
 --embedding-folder "$2/embeddings" \
---clustering-folder "$2/contexts" \
+--context-folder "$2/contexts" \
 --method ours \
-# --num-clusters 6 \
+--num-clusters 6 \
 --distance cosine \
 --embedding-dim 3 \
 --window-size 5 \

@@ -10,33 +10,41 @@ from model.reducer import Reducer
 from model.visualizer import broadcast_video
 
 
-def visualize_video(video_folder, embedding_folder, clustering_folder, demo_folder, video_name, fps=None):
+def visualize_video(video_folder, embedding_folder, clustering_folder,
+                    demo_folder, video_name, frag_width, fps=None):
     sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
+    
     sample_video_path = os.path.join(demo_folder, f'{video_name}_sample.avi')
     keyframe_video_path = os.path.join(demo_folder, f'{video_name}_keyframes.avi')
     raw_video_path = os.path.join(video_folder, f'{video_name}.mp4')
     
     try:
         samples = np.load(sample_file)
-        broadcast_video(raw_video_path=raw_video_path, frame_indexes=samples, 
-                        output_path=sample_video_path, fps=fps)
+        broadcast_video(input_video_path=raw_video_path, frame_indexes=samples,
+                        output_video_path=sample_video_path,
+                        fragment_width=frag_width, fps=fps
+                        )
+        
         keyframes = np.load(keyframe_file)
-        broadcast_video(raw_video_path=raw_video_path, frame_indexes=keyframes, 
-                        output_path=keyframe_video_path, fps=fps)
+        broadcast_video(input_video_path=raw_video_path,
+                        frame_indexes=keyframes,
+                        output_video_path=keyframe_video_path,
+                        fps=fps, fragment_width=frag_width
+                        )
     except Exception as error:
         print(error)
         print(f'{video_name} not found')
 
 
 def visualize_cluster(video_folder, embedding_folder,
-                      clustering_folder, video_name,
+                      context_folder, video_name,
                       color_value, show_image=False):
     sample_file = os.path.join(embedding_folder, f'{video_name}_samples.npy')
     embedding_file = os.path.join(embedding_folder, f'{video_name}.npy')
-    keyframe_file = os.path.join(clustering_folder, f'{video_name}_keyframes.npy')
-    label_file = os.path.join(clustering_folder, f'{video_name}_labels.npy')
-    reduced_file = os.path.join(clustering_folder, f'{video_name}_reduced.npy')
+    keyframe_file = os.path.join(context_folder, f'{video_name}_keyframes.npy')
+    label_file = os.path.join(context_folder, f'{video_name}_labels.npy')
+    reduced_file = os.path.join(context_folder, f'{video_name}_reduced.npy')
     
     video_file = os.path.join(video_folder, f'{video_name}.mp4')
     
@@ -115,19 +123,22 @@ def main():
     parser.add_argument('--visual-type', type=str, default='cluster',
                         choices=['cluster', 'video'],
                         help='visual type')
-    parser.add_argument('--output-fps', type=int, help='video fps')
     parser.add_argument('--show-image', action='store_true',
                         help='show image in cluster')
     parser.add_argument('--color-value', type=str, default='index',
                         choices=['index', 'label'],
                         help='color value')
+    
+    parser.add_argument('--output-fps', type=int, help='video fps')
+    parser.add_argument('--frag-width', type=int, default=10,
+                        help='width of key fragment around the keyframes')
 
     args = parser.parse_args()
     
     if args.visual_type == 'cluster':
         visualize_cluster(video_folder=args.video_folder,
                           embedding_folder=args.embedding_folder,
-                          clustering_folder=args.clustering_folder,
+                          context_folder=args.clustering_folder,
                           video_name=args.video_name,
                           show_image=args.show_image,
                           color_value=args.color_value
@@ -138,6 +149,7 @@ def main():
                         clustering_folder=args.clustering_folder,
                         demo_folder=args.demo_folder,
                         video_name=args.video_name,
+                        frag_width=args.frag_width,
                         fps=args.output_fps)
 
 

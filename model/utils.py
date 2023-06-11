@@ -76,5 +76,5 @@ def construct_connectivity(data, labels):
 
 def calculate_num_clusters(num_frames, max_len, frame_rate=4, modulation=1e-3):
     max_clusters = max_len*frame_rate
-    num_clusters = max_clusters*2/(1 + np.exp((-modulation) * num_frames)) - max_clusters
+    num_clusters = max_clusters*2.0/(1 + np.exp((-modulation) * num_frames)) - max_clusters
     return int(num_clusters)

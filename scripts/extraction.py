@@ -46,9 +46,9 @@ def localize_videos(embedding_folder, context_folder, method,
             if os.path.exists(segment_path):
                 continue
             
-            num_clusters = calculate_num_clusters(embeddings.shape[0],
-                                                  max_len,
-                                                  modulation
+            num_clusters = calculate_num_clusters(num_frames=embeddings.shape[0],
+                                                  max_len=max_len,
+                                                  modulation=modulation
                                                   )
             print(f"Initial number of clusters is {num_clusters} with modulation {modulation}")
             labels, parts, n_clusters, reduced_embs = localize_context(embeddings,

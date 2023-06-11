@@ -75,18 +75,18 @@ def main():
     
     # How many keyframes to select
     parser.add_argument('--max-len', type=int, default=0,
-                        "Maximum number of keyframes to select, 0 to not select")
+                        help="Maximum number of keyframes to select, 0 to not select")
     
     args = parser.parse_args()
 
     summarize_videos(embedding_folder=args.embedding_folder,
-                    context_folder=args.context_folder,
-                    summary_folder=args.summary_folder,
-                    reduced_emb=args.reduced_emb,
-                    method=args.method,
-                    representative=args.representative,
-                    key_length=args.max_len
-                    )
+                     context_folder=args.context_folder,
+                     summary_folder=args.summary_folder,
+                     reduced_emb=args.reduced_emb,
+                     method=args.method,
+                     representative=args.representative,
+                     key_length=args.max_len
+                     )
 
 
 if __name__ == '__main__':

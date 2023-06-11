@@ -50,7 +50,7 @@ def localize_videos(embedding_folder, context_folder, method,
                                                   max_len,
                                                   modulation
                                                   )
-            print(f"Initial number of clusters is {num_clusters} with modulation {modulation}}")
+            print(f"Initial number of clusters is {num_clusters} with modulation {modulation}")
             labels, parts, n_clusters, reduced_embs = localize_context(embeddings,
                                                                        method,
                                                                        num_clusters,

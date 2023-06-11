@@ -51,19 +51,20 @@ def localize_videos(embedding_folder, context_folder, method,
                                                   modulation=modulation
                                                   )
             print(f"Initial number of clusters is {num_clusters} with modulation {modulation}")
-            labels, parts, n_clusters, reduced_embs = localize_context(embeddings,
-                                                                       method,
-                                                                       num_clusters,
-                                                                       window_size,
-                                                                       min_seg_length,
-                                                                       distance,
-                                                                       embedding_dim
-                                                                       )
+            local_context = localize_context(embeddings=embeddings,
+                                             method=method,
+                                             n_clusters=num_clusters,
+                                             window_size=window_size,
+                                             min_seg_length=min_seg_length,
+                                             distance=distance,
+                                             embedding_dim=embedding_dim
+                                             )
             
+            labels, segments, n_clusters, reduced_embs = local_context
             print(f'Number of clusters: {n_clusters}')
-            print(f'Number of segments: {len(parts)}')
+            print(f'Number of segments: {len(segments)}')
             
-            np.save(segment_path, parts)
+            np.save(segment_path, segments)
             np.save(labels_path, labels)
             np.save(reduced_path, reduced_embs)
 

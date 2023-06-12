@@ -38,8 +38,9 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             scores = summarizer.score_segments(embeddings, segments)
             np.save(scores_path, scores)
             
-            if key_length > 0:
-                key_indices = summarizer.select_keyframes(scores, key_length)
+            if key_length >= 0:
+                length = key_length if key_length > 0 else len(segments)
+                key_indices = summarizer.select_keyframes(scores, length)
                 print(f'Selected {len(key_indices)} keyframes')
                 np.save(keyframes_path, key_indices)
 
@@ -61,8 +62,9 @@ def main():
                         help='Use reduced embeddings or not')
     
     # How many keyframes to select
-    parser.add_argument('--max-len', type=int, default=0,
-                        help="Maximum number of keyframes to select, 0 to not select")
+    parser.add_argument('--max-len', type=int, default=-1,
+                        help="Maximum number of keyframes to select, "
+                        + "-1 to not select, 0 to auto select")
     
     args = parser.parse_args()
 

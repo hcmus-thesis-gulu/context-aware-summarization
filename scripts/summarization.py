@@ -21,6 +21,10 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             embeddings = np.load(embedding_name)
             print(f"The extracted context has {embeddings.shape[0]} embeddings")
             
+            samples_file = filename + '_samples.npy'
+            samples_path = os.path.join(embedding_folder, samples_file)
+            samples = np.load(samples_path)
+            
             segments_path = os.path.join(context_folder, filename + '_segments.npy')
             segments = np.load(segments_path)
             print(f"The extracted context has {segments.shape[0]} segments")
@@ -36,13 +40,18 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
                 continue
             
             scores = summarizer.score_segments(embeddings, segments)
-            np.save(scores_path, scores)
+            sampled_scores = [[sample, score]
+                              for sample, score in zip(samples, scores)
+                              ]
+            np.save(scores_path, sampled_scores)
             
             if key_length >= 0:
                 length = key_length if key_length > 0 else len(segments)
-                key_indices = summarizer.select_keyframes(scores, length)
-                print(f'Selected {len(key_indices)} keyframes')
-                np.save(keyframes_path, key_indices)
+                keyframe_indices = summarizer.select_keyframes(scores, length)
+                print(f'Selected {len(keyframe_indices)} keyframes')
+                
+                keyframe_idxs = [samples[idx] for idx in keyframe_indices]
+                np.save(keyframes_path, keyframe_idxs)
 
 
 def main():

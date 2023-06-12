@@ -43,15 +43,19 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             sampled_scores = [[sample, score]
                               for sample, score in zip(samples, scores)
                               ]
-            np.save(scores_path, sampled_scores)
+            
+            # Sort by sample index
+            sorted_scores = np.asarray(sorted(sampled_scores, key=lambda x: x[0]))
+            np.save(scores_path, sorted_scores)
             
             if key_length >= 0:
                 length = key_length if key_length > 0 else len(segments)
                 keyframe_indices = summarizer.select_keyframes(scores, length)
                 print(f'Selected {len(keyframe_indices)} keyframes')
                 
-                keyframe_idxs = [samples[idx] for idx in keyframe_indices]
-                np.save(keyframes_path, keyframe_idxs)
+                keyframe_idxs = np.asarray([samples[idx]
+                                            for idx in keyframe_indices])
+                np.save(keyframes_path, np.sort(keyframe_idxs))
 
 
 def main():

@@ -6,17 +6,6 @@ import numpy as np
 from model.generator import Summarizer
 
 
-def localize_context(embeddings, method, n_clusters,
-                     representative, window_size,
-                     min_seg_length, distance, embedding_dim):
-    clusterer = Clusterer(method, distance, n_clusters, embedding_dim)
-    selector = Selector(representative, window_size, min_seg_length)
-    labels, reduced_embeddings = clusterer.cluster(embeddings)
-    
-    return (labels, selector.select(labels, reduced_embeddings),
-            clusterer.num_clusters, reduced_embeddings)
-
-
 def summarize_videos(embedding_folder, context_folder, summary_folder,
                      reduced_emb, method, representative, key_length):
     summarizer = Summarizer(representative, method)
@@ -28,12 +17,12 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             filename = embedding_name[:-len(file_end)]
             print(f"Processing the context of video {filename}")
             
-            embedding_file = os.path.join(embedding_folder, embedding_name)
-            embeddings = np.load(embedding_file)
+            embedding_name = os.path.join(embedding_folder, embedding_name)
+            embeddings = np.load(embedding_name)
             print(f"The extracted context has {embeddings.shape[0]} embeddings")
             
-            segments_file = os.path.join(context_folder, filename + '_segments.npy')
-            segments = np.load(segments_file)
+            segments_path = os.path.join(context_folder, filename + '_segments.npy')
+            segments = np.load(segments_path)
             print(f"The extracted context has {segments.shape[0]} segments")
             
             scores_file = filename + '_scores.npy'

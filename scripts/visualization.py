@@ -21,14 +21,14 @@ def visualize_video(video_folder, embedding_folder, clustering_folder,
     
     try:
         samples = np.load(sample_file)
-        broadcast_video(input_video_path=raw_video_path, frame_indexes=samples,
+        broadcast_video(input_video_path=raw_video_path, frame_indices=samples,
                         output_video_path=sample_video_path,
                         fragment_width=frag_width, fps=fps
                         )
         
         keyframes = np.load(keyframe_file)
         broadcast_video(input_video_path=raw_video_path,
-                        frame_indexes=keyframes,
+                        frame_indices=keyframes,
                         output_video_path=keyframe_video_path,
                         fps=fps, fragment_width=frag_width
                         )
@@ -63,7 +63,7 @@ def visualize_cluster(video_folder, embedding_folder,
     fig, ax = plt.subplots()
     ax.margins(tight=True)
     
-    color, label = (sample_idxs, "Sample indexes") if color_value == 'index' else (labels, "Cluster labels")
+    color, label = (sample_idxs, "Sample indices") if color_value == 'index'else (labels, "Cluster labels")
     sc = ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
                     c=color, cmap='rainbow', alpha=0.6)
     ax.set_ylabel('1st t-SNE dim')

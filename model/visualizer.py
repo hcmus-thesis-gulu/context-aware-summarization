@@ -2,7 +2,7 @@ import cv2 as cv
 from tqdm import tqdm
 
 
-def broadcast_video(input_video_path, frame_indexes,
+def broadcast_video(input_video_path, frame_indices,
                     output_video_path, fragment_width,
                     fps=None):
     raw_video = cv.VideoCapture(input_video_path)
@@ -16,7 +16,7 @@ def broadcast_video(input_video_path, frame_indexes,
     video = cv.VideoWriter(output_video_path, fourcc,
                            float(fps), (width, height))
     cur_idx = 0
-    pbar = tqdm(total=len(frame_indexes))
+    pbar = tqdm(total=len(frame_indices))
     kf_idx = 0
     
     while True:
@@ -24,12 +24,12 @@ def broadcast_video(input_video_path, frame_indexes,
         if not ret:
             break
         
-        while kf_idx < len(frame_indexes) and frame_indexes[kf_idx] < cur_idx - fragment_width:
+        while kf_idx < len(frame_indices) and frame_indices[kf_idx] < cur_idx - fragment_width:
             kf_idx += 1
-        if kf_idx < len(frame_indexes) and abs(frame_indexes[kf_idx] - cur_idx) <= fragment_width:
+        if kf_idx < len(frame_indices) and abs(frame_indices[kf_idx] - cur_idx) <= fragment_width:
             video.write(frame)
         
-        if cur_idx in frame_indexes:
+        if cur_idx in frame_indices:
             pbar.update(1)
         
         cur_idx += 1

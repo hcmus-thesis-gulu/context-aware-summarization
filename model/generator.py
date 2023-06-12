@@ -3,9 +3,8 @@ from model.utils import mean_embeddings, similarity_score
 
 
 class Summarizer:
-    def __init__(self, representative, method):
+    def __init__(self, representative):
         self.representative = representative
-        self.method = method
 
     # For each segment, compute the mean features and
     # similarity of all features with the mean
@@ -28,7 +27,5 @@ class Summarizer:
         return np.asarray(segment_scores)
 
     def select_keyframes(self, scores, length):
-        if self.method == "max":
-            return np.argpartition(scores, -length)[-length:]
-        else:
-            raise NotImplementedError
+        keyframe_indices = np.argpartition(scores, -length)[-length:]
+        return np.sort(keyframe_indices)

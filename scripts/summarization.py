@@ -7,8 +7,8 @@ from model.generator import Summarizer
 
 
 def summarize_videos(embedding_folder, context_folder, summary_folder,
-                     reduced_emb, method, representative, key_length):
-    summarizer = Summarizer(representative, method)
+                     reduced_emb, representative, key_length):
+    summarizer = Summarizer(representative)
     
     for embedding_name in os.listdir(embedding_folder):
         file_end = '_reduced.npy' if reduced_emb else '_embeddings.npy'
@@ -54,9 +54,6 @@ def main():
     parser.add_argument('--summary-folder', type=str, required=True,
                         help='path to output folder for summaries')
     
-    parser.add_argument('--method', type=str, default='max',
-                        choices=['max'],
-                        help='Method of selecting keyframes')
     parser.add_argument('--representative', type=str, default='mean',
                         choices=['mean', 'middle'],
                         help='Method of representing segments')
@@ -73,7 +70,6 @@ def main():
                      context_folder=args.context_folder,
                      summary_folder=args.summary_folder,
                      reduced_emb=args.reduced_emb,
-                     method=args.method,
                      representative=args.representative,
                      key_length=args.max_len
                      )

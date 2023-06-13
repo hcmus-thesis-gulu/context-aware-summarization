@@ -2,6 +2,7 @@ import numpy as np
 from model.utils import mean_embeddings, similarity_score
 
 
+#TODO: Better summaries with keyframes at transitions?
 class Summarizer:
     def __init__(self, representative):
         self.representative = representative

@@ -45,7 +45,8 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
                               ]
             
             # Sort by sample index
-            sorted_scores = np.asarray(sorted(sampled_scores, key=lambda x: x[0]))
+            sorted_scores = np.asarray(sorted(sampled_scores,
+                                              key=lambda x: x[0]))
             np.save(scores_path, sorted_scores)
             
             if key_length >= 0:

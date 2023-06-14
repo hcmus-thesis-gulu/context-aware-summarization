@@ -7,8 +7,8 @@ from model.generator import Summarizer
 
 
 def summarize_videos(embedding_folder, context_folder, summary_folder,
-                     reduced_emb, representative, key_length):
-    summarizer = Summarizer(representative)
+                     reduced_emb, scoring_mode, kf_mode, key_length):
+    summarizer = Summarizer(scoring_mode, kf_mode)
     
     for embedding_name in os.listdir(embedding_folder):
         file_end = '_reduced.npy' if reduced_emb else '_embeddings.npy'
@@ -50,8 +50,10 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             np.save(scores_path, sorted_scores)
             
             if key_length >= 0:
-                length = key_length if key_length > 0 else len(segments)
-                keyframe_indices = summarizer.select_keyframes(scores, length)
+                keyframe_indices = summarizer.select_keyframes(segments,
+                                                               scores,
+                                                               key_length)
+                
                 print(f'Selected {len(keyframe_indices)} keyframes')
                 
                 keyframe_idxs = np.asarray([samples[idx]
@@ -69,8 +71,10 @@ def main():
     parser.add_argument('--summary-folder', type=str, required=True,
                         help='path to output folder for summaries')
     
-    parser.add_argument('--representative', type=str, default='mean',
-                        choices=['mean', 'middle'],
+    parser.add_argument('--scoring-mode', type=str, default='mean',
+                        choices=['mean', 'middle', 'uniform'],
+                        help='Method of representing segments')
+    parser.add_argument('--kf-mode', type=str, default='mean',
                         help='Method of representing segments')
     parser.add_argument('--reduced-emb', action='store_true',
                         help='Use reduced embeddings or not')
@@ -86,7 +90,8 @@ def main():
                      context_folder=args.context_folder,
                      summary_folder=args.summary_folder,
                      reduced_emb=args.reduced_emb,
-                     representative=args.representative,
+                     scoring_mode=args.scoring_mode,
+                     kf_mode=args.kf_mode,
                      key_length=args.max_len
                      )
 

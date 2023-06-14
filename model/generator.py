@@ -2,7 +2,6 @@ import numpy as np
 from model.utils import mean_embeddings, similarity_score
 
 
-#TODO: Better summaries with keyframes at transitions?
 class Summarizer:
     def __init__(self, scoring_mode, kf_mode):
         print(f"Summarizer's scoring mode is {scoring_mode}")

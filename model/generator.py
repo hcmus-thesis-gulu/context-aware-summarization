@@ -5,7 +5,8 @@ from model.utils import mean_embeddings, similarity_score
 #TODO: Better summaries with keyframes at transitions?
 class Summarizer:
     def __init__(self, scoring_mode, kf_mode):
-        print(f"Summarizer: {scoring_mode} {kf_mode}")
+        print(f"Summarizer's scoring mode is {scoring_mode}")
+        print(f"Input KF mode is {kf_mode}")
         
         self.scoring_mode = scoring_mode
         
@@ -13,10 +14,14 @@ class Summarizer:
         if scoring_mode == 'mean':
             if 'mean' in kf_mode:
                 self.kf_mode.append('mean')
-        elif 'middle' in kf_mode:
+        
+        if 'middle' in kf_mode:
             self.kf_mode.append('middle')
-        elif 'ends' in kf_mode:
+        
+        if 'ends' in kf_mode:
             self.kf_mode.append('ends')
+            
+        print(f"Summarizer's KF mode is {self.kf_mode}")
 
     # For each segment, compute the mean features and
     # similarity of all features with the mean

@@ -35,7 +35,11 @@ def visualize_cluster(video_folder, embedding_folder,
     fig, ax = plt.subplots()
     ax.margins(tight=True)
     
-    color, label = (sample_idxs, "Sample indices") if color_value == 'index'else (labels, "Cluster labels")
+    if color_value == 'index':
+        color, label = sample_idxs, "Sample indices"
+    else:
+        color, label = labels, "Cluster labels"
+    
     sc = ax.scatter(reduced_embeddings[:, 0], reduced_embeddings[:, 1],
                     c=color, cmap='rainbow', alpha=0.6)
     ax.set_ylabel('1st t-SNE dim')
@@ -92,18 +96,11 @@ def main():
                         help='path to folder saving demo videos')
     parser.add_argument('--video-name', type=str, help='video name')
     
-    parser.add_argument('--visual-type', type=str, default='cluster',
-                        choices=['cluster', 'video'],
-                        help='visual type')
     parser.add_argument('--show-image', action='store_true',
                         help='show image in cluster')
     parser.add_argument('--color-value', type=str, default='index',
                         choices=['index', 'label'],
                         help='color value')
-    
-    parser.add_argument('--output-fps', type=int, help='video fps')
-    parser.add_argument('--frag-width', type=int, default=10,
-                        help='width of key fragment around the keyframes')
 
     args = parser.parse_args()
     

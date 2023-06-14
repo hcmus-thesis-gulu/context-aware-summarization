@@ -53,13 +53,15 @@ class Selector:
                     else:
                         middle = (start + i) // 2
                         # segments[-1][2] = middle
-                        segments[-1] = (segments[-1][0], segments[-1][1], middle)
+                        segments[-1] = (segments[-1][0], segments[-1][1],
+                                        middle)
                         start = middle
                 
                 # Add the segment to the list of segments
                 else:
                     segments.append((current_label, start, i))
                     start = i
+                    current_label = label
         
         # Post process the segments to merge consecutive segments with the same label
         post_segments = []

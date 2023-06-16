@@ -38,7 +38,7 @@ class Summarizer:
                 max_score = filling * (1 + bias)
                 min_score = filling
                 
-                if bias > 0:
+                if bias < 0:
                     max_score, min_score = min_score, max_score
                 
                 # Scores of frames are a cosine curve between nearest keyframes

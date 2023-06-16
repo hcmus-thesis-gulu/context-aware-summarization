@@ -7,7 +7,7 @@ from model.generator import Summarizer
 
 
 def summarize_videos(embedding_folder, context_folder, summary_folder,
-                     reduced_emb, scoring_mode, kf_mode, key_length):
+                     reduced_emb, scoring_mode, kf_mode, bias, key_length):
     summarizer = Summarizer(scoring_mode, kf_mode)
     
     for embedding_name in os.listdir(embedding_folder):
@@ -39,7 +39,10 @@ def summarize_videos(embedding_folder, context_folder, summary_folder,
             if os.path.exists(scores_path):
                 continue
             
-            scores = summarizer.score_segments(embeddings, segments)
+            scores = summarizer.score_segments(embeddings=embeddings,
+                                               segments=segments,
+                                               bias=bias)
+            
             sampled_scores = [[sample, score]
                               for sample, score in zip(samples, scores)
                               ]
@@ -78,6 +81,8 @@ def main():
                         help='Method of representing segments')
     parser.add_argument('--reduced-emb', action='store_true',
                         help='Use reduced embeddings or not')
+    parser.add_argument('--bias', type=float, default=0.5,
+                        help='Bias for frames near the keyframes')
     
     # How many keyframes to select
     parser.add_argument('--max-len', type=int, default=-1,
@@ -92,6 +97,7 @@ def main():
                      reduced_emb=args.reduced_emb,
                      scoring_mode=args.scoring_mode,
                      kf_mode=args.kf_mode,
+                     bias=args.bias,
                      key_length=args.max_len
                      )
 

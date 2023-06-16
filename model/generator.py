@@ -24,7 +24,7 @@ class Summarizer:
 
     # For each segment, compute the mean features and
     # similarity of all features with the mean
-    def score_segments(self, embeddings, segments):
+    def score_segments(self, embeddings, segments, bias):
         segment_scores = []
         
         for _, start, end in segments:
@@ -33,8 +33,27 @@ class Summarizer:
             
             # Calculate the scores for frames in the segment
             if self.scoring_mode == "uniform":
-                individual_score = len(segment_features)
-                score = [individual_score] * len(segment_features)
+                # Give bias to frames closer to the keyframes in positions
+                min_score = len(segment_features)
+                max_score = min_score * (1 + bias)
+                
+                # Scores of frames are a cosine curve between nearest keyframes
+                period = None
+                if "middle" in self.kf_mode and "ends" in self.kf_mode:
+                    period = 4 * np.pi
+                elif "middle" in self.kf_mode or "ends" in self.kf_mode:
+                    period = 2 * np.pi
+                
+                if period is not None:
+                    start_phase = 0 if 'ends' in self.kf_mode else np.pi
+                    end_phase = start_phase + period
+                    magnitude = (max_score - min_score) / 2
+                    domain = np.linspace(start_phase, end_phase,
+                                         end - start)
+                    
+                    score = magnitude * np.cos(domain) + magnitude + min_score
+                else:
+                    score = [min_score] * len(segment_features)
             else:
                 if self.scoring_mode == "mean":
                     representative = mean_embeddings(segment_features)

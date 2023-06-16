@@ -34,8 +34,12 @@ class Summarizer:
             # Calculate the scores for frames in the segment
             if self.scoring_mode == "uniform":
                 # Give bias to frames closer to the keyframes in positions
-                min_score = len(segment_features)
-                max_score = min_score * (1 + bias)
+                filling = len(segment_features)
+                max_score = filling * (1 + bias)
+                min_score = filling
+                
+                if bias > 0:
+                    max_score, min_score = min_score, max_score
                 
                 # Scores of frames are a cosine curve between nearest keyframes
                 period = None

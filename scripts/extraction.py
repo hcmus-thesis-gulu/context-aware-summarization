@@ -9,8 +9,8 @@ from model.utils import calculate_num_clusters
 
 
 def localize_context(embeddings, method, n_clusters, window_size,
-                     min_seg_length, distance, embedding_dim):
-    clusterer = Clusterer(method, distance, n_clusters, embedding_dim)
+                     min_seg_length, distance, embedding_dim, intermediate_components=50):
+    clusterer = Clusterer(method, distance, n_clusters, embedding_dim, intermediate_components)
     selector = Selector(window_size, min_seg_length)
     labels, reduced_embeddings = clusterer.cluster(embeddings)
     
@@ -20,7 +20,7 @@ def localize_context(embeddings, method, n_clusters, window_size,
 
 def localize_videos(embedding_folder, context_folder, method,
                     max_len, window_size, min_seg_length,
-                    distance, embedding_dim, modulation):
+                    distance, embedding_dim, modulation, intermediate_components):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('_embeddings.npy'):
             filename = embedding_name[:-len('_embeddings.npy')]
@@ -57,7 +57,8 @@ def localize_videos(embedding_folder, context_folder, method,
                                              window_size=window_size,
                                              min_seg_length=min_seg_length,
                                              distance=distance,
-                                             embedding_dim=embedding_dim
+                                             embedding_dim=embedding_dim,
+                                             intermediate_components=intermediate_components
                                              )
             
             labels, segments, n_clusters, reduced_embs = local_context
@@ -97,6 +98,8 @@ def main():
                         help='minimum segment length')
     parser.add_argument('--modulation', type=float, default=1e-3,
                         help='modulation factor for number of clusters')
+    parser.add_argument('--intermediate-components', type=int, default=50,
+                        help='intermediate components')
     
     args = parser.parse_args()
 
@@ -109,7 +112,8 @@ def main():
                     min_seg_length=args.min_seg_length,
                     distance=args.distance,
                     embedding_dim=args.embedding_dim,
-                    modulation=args.modulation
+                    modulation=args.modulation,
+                    intermediate_components=args.intermediate_components
                     )
 
 

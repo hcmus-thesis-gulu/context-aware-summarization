@@ -1,27 +1,22 @@
-import sys
-import streamlit as st
+import gradio as gr
 from scripts.summarizer import VidSum
 
-st.title('Video Summarization')
 
-# Read hyperparameters from command line arguments
-param1 = sys.argv[1]
-param2 = sys.argv[2]
+vs = VidSum()
 
-# Construct VidSum object with hyperparameters and store it in session state
-if 'vidsum' not in st.session_state:
-    st.session_state['vidsum'] = VidSum(param1, param2)
 
-uploaded_file = st.file_uploader('Choose a video file', type=['mp4', 'avi', 'mov'])
-if uploaded_file is not None:
-    st.video(uploaded_file)
+def summarize(vid, hp1, hp2):
+    vs.change_param(hyperparam1=hp1, hyperparam2=hp2)
+    summary = vs.summarize(vid)
+    return summary
 
-    # Hyperparameters
-    st.sidebar.header('Hyperparameters')
-    param3 = st.sidebar.slider('Parameter 3', 0, 100, 50)
-    param4 = st.sidebar.selectbox('Parameter 4', ['Option 1', 'Option 2', 'Option 3'])
 
-    if st.button('Summarize!'):
-        with st.spinner('Summarizing...'):
-            summarized_video = st.session_state['vidsum'].summarize(uploaded_file, param3, param4)
-        st.video(summarized_video)
+video = gr.inputs.Video(label="Upload Video")
+hyperparam1 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
+                               label="Hyperparameter 1")
+hyperparam2 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
+                               label="Hyperparameter 2")
+
+iface = gr.Interface(fn=summarize, inputs=[video, hyperparam1, hyperparam2],
+                     outputs="video", live=False)
+iface.launch()

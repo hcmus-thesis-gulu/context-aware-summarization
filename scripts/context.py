@@ -9,7 +9,6 @@ from torchvision.transforms import ToTensor
 from model.embedder import DINOEmbedder
 from model.utils import count_frames
 
-
 def generate_context(video_folder, filename, embedding_folder,
                      embedder, frame_rate=None):
     # Define transformations

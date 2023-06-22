@@ -169,6 +169,7 @@ cython_debug/
 
 # Output
 /output
+# /ablation
 
 # vsCode
 .vscode

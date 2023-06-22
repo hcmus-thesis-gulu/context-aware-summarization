@@ -16,7 +16,8 @@ example_files = [os.path.join(os.path.dirname(__file__),
 demo = gr.Interface(video_identity,
                     gr.Video(),
                     "playable_video",
-                    examples=example_files
+                    examples=example_files,
+                    cache_examples=True
                     )
 
 if __name__ == "__main__":

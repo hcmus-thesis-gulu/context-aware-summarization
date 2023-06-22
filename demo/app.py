@@ -1,22 +1,16 @@
 import gradio as gr
-from scripts.summarizer import VidSum
 
 
-vs = VidSum()
+def video_identity(video):
+    print(type(video))
+    return video
 
 
-def summarize(vid, hp1, hp2):
-    vs.change_param(hyperparam1=hp1, hyperparam2=hp2)
-    summary = vs.summarize(vid)
-    return summary
+demo = gr.Interface(video_identity,
+                    gr.Video(),
+                    "playable_video",
+                    share=True,
+                    )
 
-
-video = gr.inputs.Video(label="Upload Video")
-hyperparam1 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
-                               label="Hyperparameter 1")
-hyperparam2 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
-                               label="Hyperparameter 2")
-
-iface = gr.Interface(fn=summarize, inputs=[video, hyperparam1, hyperparam2],
-                     outputs="video", live=False)
-iface.launch()
+if __name__ == "__main__":
+    demo.launch()

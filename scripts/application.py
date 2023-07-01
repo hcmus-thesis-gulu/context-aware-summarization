@@ -19,8 +19,10 @@ class VidSum():
     Perform the full process of summarizing the given video
     """
     def __init__(self):
-        self.embedder = Embedder(representation='cls',
-                                 model_name='b16',
+        self.embedder = Embedder(model_type='clip',
+                                 representation='cls',
+                                 model_kind='base',
+                                 patch=32,
                                  device='cuda')
         
         self.input_frame_rate = None

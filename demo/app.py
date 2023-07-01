@@ -81,7 +81,7 @@ for example in os.listdir(cli_args.example_folder):
     if example.endswith(cli_args.example_extension):
         example_file = os.path.join(cli_args.example_folder, example)
         example = [example_file] + [None] * (len(inputs) - 1)
-        examples.append(example_file)
+        examples.append(example)
 
 
 demo = gr.Interface(summarize_video,

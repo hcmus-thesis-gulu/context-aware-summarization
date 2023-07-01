@@ -33,23 +33,22 @@ def summarize_video(*args):
 video = gr.Video(label="Upload your video or select an example")
 
 
-input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], value=4, type=int,
+input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], value=4,
                                label="Input Frame Rate (fps) to Sample Features")
 method = gr.Dropdown(choices=['kmeans', 'dbscan', 'gaussian', 'ours', 'agglo'],
                      value='ours',
                      label="Clustering Method for Information Propation")
 distance = gr.Dropdown(choices=['euclidean', 'cosine'], value='cosine',
                        label="Distance used for Clustering")
-max_length = gr.Slider(minimum=5, maximum=180, step=1, value=30, type=int,
+max_length = gr.Slider(minimum=5, maximum=180, step=1, value=30,
                        label="Maximum Length of Video Summary (seconds)")
-modulation = gr.Slider(minimum=-10, maximum=-1, step=0.1, value=-3, type=float,
+modulation = gr.Slider(minimum=-10, maximum=-1, step=0.1, value=-3,
                        label="Modulation Exponent ($10^x$) for Cluster Numbers")
 intermediate_components = gr.Slider(minimum=2, maximum=128, step=1, value=50,
-                                    type=int,
                                     label="Number of Intermediate Components")
-window_size = gr.Slider(minimum=1, maximum=9, step=2, value=3, type=int,
+window_size = gr.Slider(minimum=1, maximum=9, step=2, value=3,
                         label="Window Size for Smoothing")
-min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, value=3, type=int,
+min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, value=3,
                            label='Minimum Segment Length')
 
 
@@ -60,12 +59,11 @@ scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], value='uniform
 kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],
                            value=['middle', 'ends'],
                            label='Method for Selecting Keyframes from Segments')
-bias = gr.Slider(minimum=-1, maximum=1, step=0.1, value=-1, type=float,
+bias = gr.Slider(minimum=-1, maximum=1, step=0.1, value=-1,
                  label='Bias for Frames near Keyframes (0: No Bias)')
 
 
 output_frame_rate = gr.Dropdown(choices=['auto', 8, 16, 24, 30, 32], value=4,
-                                type=int,
                                 label="Output Frame Rate (fps) of Video Summary")
 sum_rate = gr.Dropdown(choices=['10%', '15%', '20%', '25%', '30%'], value='20%',
                        label="Ratio of Video Summary to Original Video Length")

@@ -94,13 +94,11 @@ class VidSum():
         total_samples = (total_frames + frame_step - 1) // frame_step
         
         # Create holders
-        embeddings = np.zeros((total_samples, self.embedder.emb_dim))
-        samples = np.zeros((total_samples), dtype=np.int64)
+        embeddings = []
+        samples = []
 
         pbar = tqdm(total=total_samples)
-        
         frame_idx = 0
-        result_idx = 0
         
         while True:
             ret, frame = cap.read()
@@ -115,17 +113,16 @@ class VidSum():
             img = transform(img).unsqueeze(0)
             embedding = self.embedder.image_embedding(img)
             
-            embeddings[result_idx] = embedding
-            samples[result_idx] = frame_idx
+            embeddings.append(embedding)
+            samples.append(frame_idx)
             
-            result_idx += 1
             frame_idx += 1
             pbar.update(1)
         
         pbar.close()
         cap.release()
         
-        return embeddings, samples
+        return np.vstack(embeddings), np.asarray(samples, dtype=np.int32)
     
     def localize_video(self, embeddings):
         num_clusters = calculate_num_clusters(num_frames=embeddings.shape[0],

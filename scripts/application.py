@@ -37,7 +37,6 @@ class VidSum():
         self.scoring_mode = None
         self.kf_mode = None
         self.bias = None
-        self.key_length = None
         
         self.output_frame_rate = None
         self.max_length = None
@@ -52,7 +51,7 @@ class VidSum():
 
     def set_params(self, input_frame_rate, method, distance, modulation,
                    intermediate_components, window_size, min_seg_length,
-                   reduced_emb, scoring_mode, kf_mode, bias, key_length,
+                   reduced_emb, scoring_mode, kf_mode, bias,
                    output_frame_rate, max_length, sum_rate, extension):
         self.input_frame_rate = input_frame_rate
         
@@ -68,7 +67,6 @@ class VidSum():
         self.scoring_mode = scoring_mode
         self.kf_mode = kf_mode
         self.bias = bias
-        self.key_length = key_length
         
         self.output_frame_rate = output_frame_rate
         self.sum_rate = sum_rate
@@ -164,17 +162,14 @@ class VidSum():
         sorted_scores = np.asarray(sorted(sampled_scores,
                                           key=lambda x: x[0]))
         
-        if self.key_length >= 0:
-            keyframe_indices = summarizer.select_keyframes(segments,
-                                                           scores,
-                                                           self.key_length)
-            
-            print(f'Selected {len(keyframe_indices)} keyframes')
-            
-            keyframe_idxs = np.asarray([samples[idx]
-                                        for idx in keyframe_indices])
-        else:
-            keyframe_idxs = None
+        keyframe_indices = summarizer.select_keyframes(segments,
+                                                       scores,
+                                                       0)
+        
+        print(f'Selected {len(keyframe_indices)} keyframes')
+        
+        keyframe_idxs = np.asarray([samples[idx]
+                                    for idx in keyframe_indices])
             
         return sorted_scores, keyframe_idxs
 

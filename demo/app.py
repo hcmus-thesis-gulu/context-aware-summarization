@@ -16,6 +16,7 @@ parser.add_argument('--output_folder', type=str, default='output',
 args = parser.parse_args()
 vs = VidSum()
 
+
 def summarize(video_path, **kwargs):
     # Create output folder
     if not os.path.exists(args.output_folder):
@@ -39,6 +40,7 @@ video = gr.Video(label="Upload your video or select an example")
 input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], default=4,
                                label="Input Frame Rate (fps) to Sample Features")
 method = gr.Dropdown(choices=['kmeans', 'dbscan', 'gaussian', 'ours', 'agglo'],
+                     default='ours',
                      label="Clustering Method for Information Propation")
 distance = gr.Dropdown(choices=['euclidean', 'cosine'], default='cosine',
                        label="Distance used for Clustering")
@@ -54,14 +56,14 @@ min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, default=3,
                            label='Minimum Segment Length')
 
 
-
 scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], default='uniform',
                            label='Method for Calculating Importances on Segments')
 kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],
                            default=['middle', 'ends'],
                            label='Method for Selecting Keyframes from Segments')
-bias = bias
-key_length = key_length
+bias = gr.Slider(minimum=-1, maximum=1, step=0.1, default=-1,
+                 label='Bias for Frames near Keyframes (0: No Bias)')
+
 
 output_frame_rate = gr.Dropdown(choices=['auto', 8, 16, 24, 30, 32], default=4,
                                 label="Output Frame Rate (fps) of Video Summary")
@@ -71,9 +73,15 @@ extension = gr.Dropdown(choices=['mp4', 'webm', 'avi'], default='mp4',
                         label="Extension of Video Summary (for storage)")
 
 
+inputs = [video, input_frame_rate, method, distance, max_length, modulation,
+          intermediate_components, window_size, min_seg_length, scoring_mode,
+          kf_mode, bias, output_frame_rate, sum_rate, extension]
+outputs = [gr.Video(label="Video Summary")]
+
+
 demo = gr.Interface(summarize,
-                    inputs=gr.Video(),
-                    outputs="playable_video",
+                    inputs=inputs,
+                    outputs=outputs,
                     examples=example_files,
                     cache_examples=True,
                     live=False

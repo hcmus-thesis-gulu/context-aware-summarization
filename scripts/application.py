@@ -55,7 +55,7 @@ class VidSum():
                    modulation, intermediate_components, window_size,
                    min_seg_length, reduced_emb, scoring_mode, kf_mode,
                    bias, output_frame_rate, sum_rate, extension):
-        self.input_frame_rate = input_frame_rate
+        self.input_frame_rate = int(input_frame_rate)
         
         self.method = method
         self.distance = distance

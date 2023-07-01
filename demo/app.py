@@ -77,9 +77,9 @@ outputs = [gr.Video(label="Video Summary")]
 
 
 examples = []
-for example in os.listdir(args.example_folder):
-    if example.endswith(args.example_extension):
-        example_file = os.path.join(args.example_folder, example)
+for example in os.listdir(cli_args.example_folder):
+    if example.endswith(cli_args.example_extension):
+        example_file = os.path.join(cli_args.example_folder, example)
         example = [example_file] + [None] * (len(inputs) - 1)
         examples.append(example_file)
 

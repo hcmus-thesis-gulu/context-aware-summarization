@@ -16,6 +16,15 @@ class DINOEmbedder:
         
         self.model.to(self.device)
         print(f'Using {self.device} device')
+        
+    def set_params(self, feature_type, device):
+        self.feature_type = feature_type
+        new_device = 'cuda' if (torch.cuda.is_available() and device == 'cuda') else 'cpu'
+        
+        if self.device != new_device:
+            self.device = new_device
+            self.model.to(self.device)
+            print(f'Using {self.device} device')
 
     def image_embedding(self, image):
         self.model.eval()

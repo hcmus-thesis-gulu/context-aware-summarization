@@ -9,6 +9,7 @@ from torchvision.transforms import ToTensor
 from model.embedder import DINOEmbedder
 from model.utils import count_frames
 
+
 def generate_context(video_folder, filename, embedding_folder,
                      embedder, frame_rate=None):
     # Define transformations
@@ -28,7 +29,7 @@ def generate_context(video_folder, filename, embedding_folder,
     # Get the video's frame rate, total frames
     fps, total_frames = count_frames(video_file)
     
-    if frame_rate == None:
+    if frame_rate is None:
         frame_rate = fps
     
     # Calculate the total number of samples

@@ -18,12 +18,14 @@ class Embedder:
             
             self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.model_path)
             self.model = ViTModel.from_pretrained(self.model_path)
+            self.emb_dim = 768
         elif model_type == 'clip':
             self.model_path = f"openai/clip-vit-{model_kind}-patch{patch}"
             print(f'Loading CLIP model from {self.model_path}...')
             
             self.feature_extractor = CLIPProcessor.from_pretrained(self.model_path)
             self.model = CLIPModel.from_pretrained(self.model_path)
+            self.emb_dim = self.model.projection_dim
         
         self.model.eval()
         self.model.to(self.device)

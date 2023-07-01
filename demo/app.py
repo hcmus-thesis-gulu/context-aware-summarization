@@ -52,8 +52,7 @@ min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, value=3,
                            label='Minimum Segment Length')
 
 
-reduced_emb = gr.Checkbox(label='Use Reduced Embeddings', value=True,
-                          type=bool)
+reduced_emb = gr.Checkbox(label='Use Reduced Embeddings', value=True)
 scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], value='uniform',
                            label='Method for Calculating Importances on Segments')
 kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],

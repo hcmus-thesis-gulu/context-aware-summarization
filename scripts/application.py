@@ -59,18 +59,18 @@ class VidSum():
         
         self.method = method
         self.distance = distance
-        self.max_length = max_length
-        self.modulation = float(10.0 ** modulation)
-        self.intermediate_components = intermediate_components
-        self.window_size = window_size
-        self.min_seg_length = min_seg_length
+        self.max_length = int(max_length)
+        self.modulation = float(10.0 ** float(modulation))
+        self.intermediate_components = int(intermediate_components)
+        self.window_size = int(window_size)
+        self.min_seg_length = int(min_seg_length)
         
-        self.reduced_emb = reduced_emb
+        self.reduced_emb = bool(reduced_emb)
         self.scoring_mode = scoring_mode
         self.kf_mode = kf_mode
-        self.bias = bias
+        self.bias = float(bias)
         
-        self.output_frame_rate = output_frame_rate
+        self.output_frame_rate = int(output_frame_rate)
         self.sum_rate = sum_rate
         self.extension = extension.lower()
     

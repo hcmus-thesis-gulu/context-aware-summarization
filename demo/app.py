@@ -17,13 +17,13 @@ args = parser.parse_args()
 vs = VidSum()
 
 
-def summarize(video_path, **kwargs):
+def summarize_video(inp):
     # Create output folder
     if not os.path.exists(args.output_folder):
         os.makedirs(args.output_folder)
     
-    vs.set_params(**kwargs)
-    summary = vs.summarize(video_path, args.output_folder)
+    vs.set_params(*inp[1:])
+    summary = vs.summarize(inp[0], args.output_folder)
     return summary
 
 
@@ -80,10 +80,10 @@ for example in os.listdir(args.example_folder):
         examples.append(example_file)
 
 
-demo = gr.Interface(summarize,
+demo = gr.Interface(summarize_video,
                     inputs=inputs,
                     outputs=outputs,
-                    examples=examples,
+                    examples=[examples],
                     cache_examples=True,
                     live=False
                     )

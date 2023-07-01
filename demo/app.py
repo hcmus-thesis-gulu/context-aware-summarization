@@ -23,7 +23,7 @@ def summarize_video(*args):
         os.makedirs(cli_args.output_folder)
     
     for arg in args:
-        print(type(arg))
+        print(arg, type(arg))
     
     vs.set_params(*args[1:])
     summary = vs.summarize(args[0], cli_args.output_folder)
@@ -88,7 +88,7 @@ demo = gr.Interface(summarize_video,
                     inputs=inputs,
                     outputs=outputs,
                     examples=[examples],
-                    cache_examples=True,
+                    cache_examples=False,
                     live=False
                     )
 

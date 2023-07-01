@@ -33,7 +33,7 @@ def summarize_video(*args):
 video = gr.Video(label="Upload your video or select an example")
 
 
-input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], value=4,
+input_frame_rate = gr.Dropdown(choices=['auto', 1, 2, 4, 8], value=4,
                                label="Input Frame Rate (fps) to Sample Features")
 method = gr.Dropdown(choices=['kmeans', 'dbscan', 'gaussian', 'ours', 'agglo'],
                      value='ours',

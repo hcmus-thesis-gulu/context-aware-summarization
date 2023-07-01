@@ -33,40 +33,43 @@ def summarize_video(*args):
 video = gr.Video(label="Upload your video or select an example")
 
 
-input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], default=4,
+input_frame_rate = gr.Dropdown(choices=[1, 2, 4, 8, 16], value=4, type=int,
                                label="Input Frame Rate (fps) to Sample Features")
 method = gr.Dropdown(choices=['kmeans', 'dbscan', 'gaussian', 'ours', 'agglo'],
-                     default='ours',
+                     value='ours',
                      label="Clustering Method for Information Propation")
-distance = gr.Dropdown(choices=['euclidean', 'cosine'], default='cosine',
+distance = gr.Dropdown(choices=['euclidean', 'cosine'], value='cosine',
                        label="Distance used for Clustering")
-max_length = gr.Slider(minimum=5, maximum=180, step=1, default=30,
+max_length = gr.Slider(minimum=5, maximum=180, step=1, value=30, type=int,
                        label="Maximum Length of Video Summary (seconds)")
-modulation = gr.Slider(minimum=-10, maximum=-1, step=0.1, default=-3,
+modulation = gr.Slider(minimum=-10, maximum=-1, step=0.1, value=-3, type=float,
                        label="Modulation Exponent ($10^x$) for Cluster Numbers")
-intermediate_components = gr.Slider(minimum=2, maximum=128, step=1, default=50,
+intermediate_components = gr.Slider(minimum=2, maximum=128, step=1, value=50,
+                                    type=int,
                                     label="Number of Intermediate Components")
-window_size = gr.Slider(minimum=1, maximum=9, step=2, default=3,
+window_size = gr.Slider(minimum=1, maximum=9, step=2, value=3, type=int,
                         label="Window Size for Smoothing")
-min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, default=3,
+min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, value=3, type=int,
                            label='Minimum Segment Length')
 
 
-reduced_emb = gr.Checkbox(label='Use Reduced Embeddings')
-scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], default='uniform',
+reduced_emb = gr.Checkbox(label='Use Reduced Embeddings', value=True,
+                          type=bool)
+scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], value='uniform',
                            label='Method for Calculating Importances on Segments')
 kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],
-                           default=['middle', 'ends'],
+                           value=['middle', 'ends'],
                            label='Method for Selecting Keyframes from Segments')
-bias = gr.Slider(minimum=-1, maximum=1, step=0.1, default=-1,
+bias = gr.Slider(minimum=-1, maximum=1, step=0.1, value=-1, type=float,
                  label='Bias for Frames near Keyframes (0: No Bias)')
 
 
-output_frame_rate = gr.Dropdown(choices=['auto', 8, 16, 24, 30, 32], default=4,
+output_frame_rate = gr.Dropdown(choices=['auto', 8, 16, 24, 30, 32], value=4,
+                                type=int,
                                 label="Output Frame Rate (fps) of Video Summary")
-sum_rate = gr.Dropdown(choices=['10%', '15%', '20%', '25%', '30%'], default='20%',
+sum_rate = gr.Dropdown(choices=['10%', '15%', '20%', '25%', '30%'], value='20%',
                        label="Ratio of Video Summary to Original Video Length")
-extension = gr.Dropdown(choices=['mp4', 'webm', 'avi'], default='mp4',
+extension = gr.Dropdown(choices=['mp4', 'webm', 'avi'], value='mp4',
                         label="Extension of Video Summary (for storage)")
 
 

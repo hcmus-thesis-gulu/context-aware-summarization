@@ -17,7 +17,7 @@ args = parser.parse_args()
 vs = VidSum()
 
 
-def summarize_video(inp):
+def summarize_video(*inp):
     # Create output folder
     if not os.path.exists(args.output_folder):
         os.makedirs(args.output_folder)

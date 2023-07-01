@@ -6,7 +6,7 @@ import cv2 as cv
 from torchvision.transforms import ToTensor
 from PIL import Image
 
-from model.embedder import DINOEmbedder
+from model.embedder import Embedder
 from model.propogator import Clusterer
 from model.selector import Selector
 from model.generator import Summarizer
@@ -19,7 +19,7 @@ class VidSum():
     Perform the full process of summarizing the given video
     """
     def __init__(self):
-        self.embedder = DINOEmbedder(representation='cls',
+        self.embedder = Embedder(representation='cls',
                                      model_name='b16',
                                      device='cuda')
         

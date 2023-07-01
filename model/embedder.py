@@ -1,18 +1,24 @@
 import torch
-from transformers import ViTFeatureExtractor, ViTModel
+# from transformers import ViTFeatureExtractor, ViTModel
+from transformers import CLIPProcessor, CLIPModel
 
 
-class DINOEmbedder:
-    def __init__(self, representation='cls', model_name='b16', device='cpu'):
+class Embedder:
+    def __init__(self, representation='cls', model_name='base-patch32', device='cpu'):
         # Load DINO model and feature extractor
         self.feature_type = representation
-        self.model_path = f'facebook/dino-vit{model_name}'
+        # self.model_path = f'facebook/dino-vit{model_name}'
+        self.model_path = f"openai/clip-vit-{model_name}"
         self.device = 'cuda' if (torch.cuda.is_available() and device == 'cuda') else 'cpu'
         self.emb_dim = 768
         
-        print(f'Loading DINO model from {self.model_path}...')
-        self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.model_path)
-        self.model = ViTModel.from_pretrained(self.model_path)
+        # print(f'Loading DINO model from {self.model_path}...')
+        # self.feature_extractor = ViTFeatureExtractor.from_pretrained(self.model_path)
+        # self.model = ViTModel.from_pretrained(self.model_path)
+        
+        print(f'Loading CLIP model from {self.model_path}...')
+        self.feature_extractor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+        self.model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
         
         self.model.to(self.device)
         print(f'Using {self.device} device')

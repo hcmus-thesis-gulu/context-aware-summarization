@@ -87,7 +87,7 @@ for example in os.listdir(cli_args.example_folder):
 demo = gr.Interface(summarize_video,
                     inputs=inputs,
                     outputs=outputs,
-                    examples=[examples],
+                    examples=examples,
                     cache_examples=False,
                     live=False
                     )

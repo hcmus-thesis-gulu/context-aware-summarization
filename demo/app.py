@@ -62,7 +62,7 @@ bias = gr.Slider(minimum=-1, maximum=1, step=0.1, value=-1,
                  label='Bias for Frames near Keyframes (0: No Bias)')
 
 
-output_frame_rate = gr.Dropdown(choices=['auto', 8, 16, 24, 30, 32], value=4,
+output_frame_rate = gr.Dropdown(choices=['auto', 4, 8, 16, 24, 30, 32], value=4,
                                 label="Output Frame Rate (fps) of Video Summary")
 sum_rate = gr.Dropdown(choices=['10%', '15%', '20%', '25%', '30%'], value='20%',
                        label="Ratio of Video Summary to Original Video Length")

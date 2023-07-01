@@ -20,8 +20,8 @@ class VidSum():
     """
     def __init__(self):
         self.embedder = Embedder(representation='cls',
-                                     model_name='b16',
-                                     device='cuda')
+                                 model_name='b16',
+                                 device='cuda')
         
         self.input_frame_rate = None
         
@@ -49,10 +49,10 @@ class VidSum():
             'webm': 'VP09'
         }
 
-    def set_params(self, input_frame_rate, method, distance, modulation,
-                   intermediate_components, window_size, min_seg_length,
-                   reduced_emb, scoring_mode, kf_mode, bias,
-                   output_frame_rate, max_length, sum_rate, extension):
+    def set_params(self, input_frame_rate, method, distance, max_length,
+                   modulation, intermediate_components, window_size,
+                   min_seg_length, reduced_emb, scoring_mode, kf_mode,
+                   bias, output_frame_rate, sum_rate, extension):
         self.input_frame_rate = input_frame_rate
         
         self.method = method

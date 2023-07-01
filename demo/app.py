@@ -49,6 +49,7 @@ min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, default=3,
                            label='Minimum Segment Length')
 
 
+reduced_emb = gr.Checkbox(label='Use Reduced Embeddings')
 scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], default='uniform',
                            label='Method for Calculating Importances on Segments')
 kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],
@@ -67,8 +68,8 @@ extension = gr.Dropdown(choices=['mp4', 'webm', 'avi'], default='mp4',
 
 
 inputs = [video, input_frame_rate, method, distance, max_length, modulation,
-          intermediate_components, window_size, min_seg_length, scoring_mode,
-          kf_mode, bias, output_frame_rate, sum_rate, extension]
+          intermediate_components, window_size, min_seg_length, reduced_emb,
+          scoring_mode, kf_mode, bias, output_frame_rate, sum_rate, extension]
 outputs = [gr.Video(label="Video Summary")]
 
 

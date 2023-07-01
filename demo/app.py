@@ -13,17 +13,20 @@ parser.add_argument('--example-extension', type=str, default='examples',
                     help='Path to the example folder')
 parser.add_argument('--output-folder', type=str, default='output',
                     help='Path to the output folder')
-args = parser.parse_args()
+cli_args = parser.parse_args()
 vs = VidSum()
 
 
-def summarize_video(*inp):
+def summarize_video(*args):
     # Create output folder
-    if not os.path.exists(args.output_folder):
-        os.makedirs(args.output_folder)
+    if not os.path.exists(cli_args.output_folder):
+        os.makedirs(cli_args.output_folder)
     
-    vs.set_params(*inp[1:])
-    summary = vs.summarize(inp[0], args.output_folder)
+    for arg in args:
+        print(type(arg))
+    
+    vs.set_params(*args[1:])
+    summary = vs.summarize(args[0], cli_args.output_folder)
     return summary
 
 

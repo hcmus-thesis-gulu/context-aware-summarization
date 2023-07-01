@@ -11,7 +11,7 @@ parser.add_argument('--example-folder', type=str, default='examples',
 parser.add_argument('--example-extension', type=str, default='examples',
                     choices=['mp4', 'webm', 'avi'],
                     help='Path to the example folder')
-parser.add_argument('--output_folder', type=str, default='output',
+parser.add_argument('--output-folder', type=str, default='output',
                     help='Path to the output folder')
 args = parser.parse_args()
 vs = VidSum()
@@ -25,13 +25,6 @@ def summarize(video_path, **kwargs):
     vs.set_params(**kwargs)
     summary = vs.summarize(video_path, args.output_folder)
     return summary
-
-
-example_files = []
-for example in os.listdir(args.example_folder):
-    if example.endswith(args.example_extension):
-        example_file = os.path.join(args.example_folder, example)
-        example_files.append(example_file)
 
 
 video = gr.Video(label="Upload your video or select an example")
@@ -79,10 +72,18 @@ inputs = [video, input_frame_rate, method, distance, max_length, modulation,
 outputs = [gr.Video(label="Video Summary")]
 
 
+examples = []
+for example in os.listdir(args.example_folder):
+    if example.endswith(args.example_extension):
+        example_file = os.path.join(args.example_folder, example)
+        example = [example_file] + [None] * (len(inputs) - 1)
+        examples.append(example_file)
+
+
 demo = gr.Interface(summarize,
                     inputs=inputs,
                     outputs=outputs,
-                    examples=example_files,
+                    examples=examples,
                     cache_examples=True,
                     live=False
                     )

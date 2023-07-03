@@ -85,7 +85,7 @@ def main():
                         help='Bias for frames near the keyframes')
     
     # How many keyframes to select
-    parser.add_argument('--max-len', type=int, default=-1,
+    parser.add_argument('--key-length', type=int, default=-1,
                         help="Maximum number of keyframes to select, "
                         + "-1 to not select, 0 to auto select")
     
@@ -98,7 +98,7 @@ def main():
                      scoring_mode=args.scoring_mode,
                      kf_mode=args.kf_mode,
                      bias=args.bias,
-                     key_length=args.max_len
+                     key_length=args.key_length
                      )
 
 

@@ -6,8 +6,9 @@ import cv2 as cv
 from tqdm import tqdm
 from PIL import Image
 from torchvision.transforms import ToTensor
-from model.embedder import DINOEmbedder
+from model.embedder import Embedder
 from model.utils import count_frames
+
 
 def generate_context(video_folder, filename, embedding_folder,
                      embedder, frame_rate=None):
@@ -28,7 +29,7 @@ def generate_context(video_folder, filename, embedding_folder,
     # Get the video's frame rate, total frames
     fps, total_frames = count_frames(video_file)
     
-    if frame_rate == None:
+    if frame_rate is None:
         frame_rate = fps
     
     # Calculate the total number of samples
@@ -74,7 +75,7 @@ def generate_context(video_folder, filename, embedding_folder,
 
 def videos_context(video_folder, embedding_folder, frame_rate=None,
                    representation='cls', model_name='b16', device='cuda'):
-    embedder = DINOEmbedder(representation, model_name, device)
+    embedder = Embedder(representation, model_name, device)
     
     # Extract features for each video file
     for filename in os.listdir(video_folder):

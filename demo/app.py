@@ -1,22 +1,102 @@
+import os
 import gradio as gr
-from scripts.summarizer import VidSum
+import argparse
+
+from scripts.application import VidSum
 
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--example-folder', type=str, default='examples',
+                    help='Path to the example folder')
+parser.add_argument('--example-extension', type=str, default='examples',
+                    choices=['mp4', 'webm', 'avi'],
+                    help='Path to the example folder')
+parser.add_argument('--output-folder', type=str, default='output',
+                    help='Path to the output folder')
+cli_args = parser.parse_args()
 vs = VidSum()
 
 
-def summarize(vid, hp1, hp2):
-    vs.change_param(hyperparam1=hp1, hyperparam2=hp2)
-    summary = vs.summarize(vid)
+def summarize_video(*args):
+    # Create output folder
+    if not os.path.exists(cli_args.output_folder):
+        os.makedirs(cli_args.output_folder)
+    
+    for arg in args:
+        print(arg, type(arg))
+    
+    vs.set_params(*args[1:])
+    summary = vs.summarize(args[0], cli_args.output_folder)
     return summary
 
 
-video = gr.inputs.Video(label="Upload Video")
-hyperparam1 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
-                               label="Hyperparameter 1")
-hyperparam2 = gr.inputs.Slider(minimum=0, maximum=10, default=5,
-                               label="Hyperparameter 2")
+video = gr.Video(label="Upload your video or select an example")
 
-iface = gr.Interface(fn=summarize, inputs=[video, hyperparam1, hyperparam2],
-                     outputs="video", live=False)
-iface.launch()
+
+input_frame_rate = gr.Dropdown(choices=['auto', 1, 2, 4, 8], value=4,
+                               label="Input Frame Rate (fps) to Sample Features")
+method = gr.Dropdown(choices=['kmeans', 'dbscan', 'gaussian', 'ours', 'agglo'],
+                     value='ours',
+                     label="Clustering Method for Information Propation")
+distance = gr.Dropdown(choices=['euclidean', 'cosine'], value='cosine',
+                       label="Distance used for Clustering")
+max_length = gr.Slider(minimum=5, maximum=180, step=1, value=30,
+                       label="Maximum Length of Video Summary (seconds)")
+modulation = gr.Slider(minimum=-10, maximum=-1, step=0.1, value=-3,
+                       label="Modulation Exponent ($10^x$) for Cluster Numbers")
+intermediate_components = gr.Slider(minimum=2, maximum=128, step=1, value=50,
+                                    label="Number of Intermediate Components")
+window_size = gr.Slider(minimum=1, maximum=9, step=2, value=3,
+                        label="Window Size for Smoothing")
+min_seg_length = gr.Slider(minimum=1, maximum=5, step=1, value=3,
+                           label='Minimum Segment Length')
+
+
+reduced_emb = gr.Checkbox(label='Use Reduced Embeddings', value=True)
+scoring_mode = gr.Dropdown(choices=['mean', 'middle', 'uniform'], value='uniform',
+                           label='Method for Calculating Importances on Segments')
+kf_mode = gr.CheckboxGroup(choices=['mean', 'middle', 'ends'],
+                           value=['middle', 'ends'],
+                           label='Method for Selecting Keyframes from Segments')
+bias = gr.Slider(minimum=-1, maximum=1, step=0.1, value=-1,
+                 label='Bias for Frames near Keyframes (0: No Bias)')
+
+
+output_frame_rate = gr.Dropdown(choices=['auto', 4, 8, 16, 24, 30, 32], value=4,
+                                label="Output Frame Rate (fps) of Video Summary")
+sum_rate = gr.Dropdown(choices=['10%', '15%', '20%', '25%', '30%'], value='20%',
+                       label="Ratio of Video Summary to Original Video Length")
+extension = gr.Dropdown(choices=['mp4', 'webm', 'avi'], value='mp4',
+                        label="Extension of Video Summary (for storage)")
+
+
+inputs = [video, input_frame_rate, method, distance, max_length, modulation,
+          intermediate_components, window_size, min_seg_length, reduced_emb,
+          scoring_mode, kf_mode, bias, output_frame_rate, sum_rate, extension]
+outputs = [gr.Video(label="Video Summary")]
+
+
+examples = []
+for example in os.listdir(cli_args.example_folder):
+    if example.endswith(cli_args.example_extension):
+        example_file = os.path.join(cli_args.example_folder, example)
+        example = [example_file] + [None] * (len(inputs) - 1)
+        examples.append(example)
+
+
+demo = gr.Interface(summarize_video,
+                    inputs=inputs,
+                    outputs=outputs,
+                    examples=examples,
+                    cache_examples=False,
+                    live=False
+                    )
+
+
+def app():
+    demo.launch(share=True,
+                debug=True)
+
+
+if __name__ == "__main__":
+    app()

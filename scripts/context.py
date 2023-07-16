@@ -74,9 +74,14 @@ def generate_context(video_folder, filename, embedding_folder,
     
 
 def videos_context(video_folder, embedding_folder, frame_rate=None,
-                   representation='cls', model_name='b16', device='cuda'):
-    embedder = Embedder(representation, model_name, device)
-    
+                   model_type='dino', model_kind='base', patch=16,
+                   representation='cls', device='cuda'):
+    embedder = Embedder(model_type=model_type,
+                        model_kind=model_kind,
+                        patch=patch,
+                        representation=representation,
+                        device=device)
+
     # Extract features for each video file
     for filename in os.listdir(video_folder):
         if filename.endswith('.mp4'):
@@ -108,7 +113,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     videos_context(args.video_folder, args.embedding_folder,
-                                args.frame_rate, args.representation,
-                                args.model_name, args.device
-                                )
+                   frame_rate=args.frame_rate,
+                   representation=args.representation,
+                   device=args.device
+                   )
+    
     print("--- %s seconds ---" % (time.time() - start_time))

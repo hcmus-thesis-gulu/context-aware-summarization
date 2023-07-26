@@ -103,19 +103,29 @@ if __name__ == '__main__':
     parser.add_argument('--frame-rate', type=int, 
                         help='Number of frames per second to sample from videos')
     
-    parser.add_argument('--model-name', type=str, default='b16',
-                        choices=['b16', 'b8', 's16', 's8'],
-                        help='Name of the DINO model')
+    # parser.add_argument('--model-name', type=str, default='b16',
+    #                     choices=['b16', 'b8', 's16', 's8'],
+    #                     help='Name of the DINO model')
+    parser.add_argument('--model-type', type=str, default='dino',
+                        choices=['dino', 'clip'])
+    parser.add_argument('--model-kind', type=str, default='b',
+                        choices=['b', 's', 'base'])
+    parser.add_argument('--patch', type=int, default=16,
+                        choices= [8, 16])
     parser.add_argument('--device', type=str, default='cuda',
                         choices=['cuda', 'cpu'],
                         help='Device to run the model on')
 
     args = parser.parse_args()
 
-    videos_context(args.video_folder, args.embedding_folder,
+    videos_context(video_folder=args.video_folder,
+                   embedding_folder=args.embedding_folder,
                    frame_rate=args.frame_rate,
+                   model_type=args.model_type,
+                   model_kind=args.model_kind,
+                   patch=args.patch,
                    representation=args.representation,
-                   device=args.device
+                   device=args.device,
                    )
     
     print("--- %s seconds ---" % (time.time() - start_time))

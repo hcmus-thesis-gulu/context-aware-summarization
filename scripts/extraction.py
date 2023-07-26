@@ -9,8 +9,8 @@ from model.utils import calculate_num_clusters
 
 
 def localize_context(embeddings, method, n_clusters, window_size,
-                     min_seg_length, distance, embedding_dim, intermediate_components=50):
-    clusterer = Clusterer(method, distance, n_clusters, embedding_dim, intermediate_components)
+                     min_seg_length, distance, embedding_dim, intermediate_components=50, final_reducer='tsne'):
+    clusterer = Clusterer(method, distance, n_clusters, embedding_dim, intermediate_components, final_reducer=final_reducer)
     selector = Selector(window_size, min_seg_length)
     labels, reduced_embeddings = clusterer.cluster(embeddings)
     
@@ -20,7 +20,7 @@ def localize_context(embeddings, method, n_clusters, window_size,
 
 def localize_videos(embedding_folder, context_folder, method,
                     max_len, window_size, min_seg_length,
-                    distance, embedding_dim, modulation, intermediate_components):
+                    distance, embedding_dim, modulation, intermediate_components, final_reducer='tsne'):
     for embedding_name in os.listdir(embedding_folder):
         if embedding_name.endswith('_embeddings.npy'):
             filename = embedding_name[:-len('_embeddings.npy')]
@@ -58,7 +58,8 @@ def localize_videos(embedding_folder, context_folder, method,
                                              min_seg_length=min_seg_length,
                                              distance=distance,
                                              embedding_dim=embedding_dim,
-                                             intermediate_components=intermediate_components
+                                             intermediate_components=intermediate_components,
+                                             final_reducer=final_reducer
                                              )
             
             labels, segments, n_clusters, reduced_embs = local_context
@@ -82,14 +83,14 @@ def main():
                         choices=['kmeans', 'dbscan', 'gaussian',
                                  'agglo', 'ours'],
                         help='clustering method')
-    parser.add_argument('--num-clusters', type=int, default=0,
-                        help='Number of clusters with 0 being automatic detection')
+    # parser.add_argument('--num-clusters', type=int, default=0,
+    #                     help='Number of clusters with 0 being automatic detection')
     parser.add_argument('--max-len', type=int, default=60,
                         help='Maximum length of output summarization in seconds')
     parser.add_argument('--distance', type=str, default='euclidean',
                         choices=['jensenshannon', 'euclidean', 'cosine'],
                         help='distance metric for clustering')
-    parser.add_argument('--embedding-dim', type=int, default=3,
+    parser.add_argument('--embedding-dim', type=int, default=-1,
                         help='dimension of embeddings')
     
     parser.add_argument('--window-size', type=int, default=10,
@@ -98,8 +99,10 @@ def main():
                         help='minimum segment length')
     parser.add_argument('--modulation', type=float, default=1e-3,
                         help='modulation factor for number of clusters')
-    parser.add_argument('--intermediate-components', type=int, default=50,
+    parser.add_argument('--intermediate-components', type=int, default=-1,
                         help='intermediate components')
+    parser.add_argument('--final-reducer', type=str, default='tsne',
+                        choices=['pca', 'tsne'])
     
     args = parser.parse_args()
 
@@ -113,7 +116,8 @@ def main():
                     distance=args.distance,
                     embedding_dim=args.embedding_dim,
                     modulation=args.modulation,
-                    intermediate_components=args.intermediate_components
+                    intermediate_components=args.intermediate_components,
+                    final_reducer=args.final_reducer,
                     )
 
 

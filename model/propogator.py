@@ -5,13 +5,13 @@ from model.utils import distance_metric, construct_connectivity
 
 
 class Clusterer:
-    def __init__(self, method, distance, num_clusters, embedding_dim, intermediate_components=50):
+    def __init__(self, method, distance, num_clusters, embedding_dim, intermediate_components=50, final_reducer='tsne'):
         self.method = method
         self.num_clusters = num_clusters
         self.distance = distance
         self.metric = distance_metric(distance)
         
-        self.reducer = Reducer(num_components=embedding_dim, intermediate_components=intermediate_components)
+        self.reducer = Reducer(num_components=embedding_dim, intermediate_components=intermediate_components, final_reducer=final_reducer)
         self.scaler = Scaler()
         
         if self.method == 'kmeans':
@@ -30,6 +30,7 @@ class Clusterer:
 
     def cluster(self, embeddings):
         pre_embeddings, reduced_embeddings = self.reducer.reduce(embeddings)
+        print("HIHIHIHIHIHIHIHIHIHIHIHIHIHI: ", pre_embeddings.shape, reduced_embeddings.shape)
         scaled_embeddings = self.scaler.predict(reduced_embeddings)
         
         if self.method == 'ours':

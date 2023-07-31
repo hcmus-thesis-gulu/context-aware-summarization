@@ -67,5 +67,6 @@ class Embedder:
                 feature = features[0]
             else:
                 feature = torch.mean(features, dim=0)
-        
-        return feature
+            return feature
+        elif self.model_type == 'clip':
+            return features

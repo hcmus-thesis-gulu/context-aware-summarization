@@ -173,3 +173,6 @@ cython_debug/
 
 # vsCode
 .vscode
+
+# Google Drive
+*/desktop.ini

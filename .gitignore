@@ -169,7 +169,11 @@ cython_debug/
 
 # Output
 /output
-# /ablation
+/ablation
 
 # vsCode
 .vscode
+
+# Google Drive desktop.ini
+*/desktop.ini
+**/desktop.ini
